@@ -47,7 +47,7 @@ const withDefaults = (optns) => {
  * @description encode given payload as jwt.
  * @param {Object} payload data to encode.
  * @param {Object} [opts] jwt sign or encoding options.
- * @param {Function} cb callback to invoke on success or failure
+ * @param {Function} cb callback to invoke on success or failure.
  * @return {String|Error} jwt token if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
@@ -65,31 +65,19 @@ const withDefaults = (optns) => {
  */
 const encode = (payload, optns, cb) => {
   // normalize arguments
-  const options = exports.withDefaults(_.isFunction(optns) ? {} : optns);
+  const options = withDefaults(_.isFunction(optns) ? {} : optns);
   const done = _.isFunction(optns) ? optns : cb;
 
-  // ensure payload
+  // throw if empty payload
   if (_.isEmpty(payload)) {
     return done(new Error('payload is required'));
   }
 
-  // try to encode payload
-  try {
+  // prepare jwt sign options
+  const { secret, ...rest } = options;
 
-    // prepare jwt sing options
-    const { secret, ...rest } = options;
-
-    // generate jwt
-    const token = jwt.sign(payload, secret, rest);
-
-    // return token
-    return done(null, token);
-  }
-
-  // return error
-  catch (error) {
-    return done(error);
-  }
+  // generate jwt
+  jwt.sign(payload, secret, rest, done);
 
 };
 
@@ -98,7 +86,9 @@ const encode = (payload, optns, cb) => {
  * @function decode
  * @name decode
  * @description decode and verify given jwt.
- * @param {String} jwy token to decode.
+ * @param {String} tokn jwt token to decode.
+ * @param {Object} [opts] jwt verify or decoding options.
+ * @param {Function} cb callback to invoke on success or failure.
  * @return {Payload|Error} payload if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
@@ -114,8 +104,18 @@ const encode = (payload, optns, cb) => {
  * decode(token, (error, payload) => { ...});
  * decode(token, { secret }, (error, payload) => { ...});
  */
-const decode = (payload, options, done) => {
-  done();
+const decode = (token, optns, cb) => {
+  // normalize arguments
+  const options = withDefaults(_.isFunction(optns) ? {} : optns);
+  const done = _.isFunction(optns) ? optns : cb;
+
+  // prepare jwt decoding options
+  const { secret, ...rest } = options;
+
+  // decode and verify
+  jwt.verify(token, secret, rest, done);
+
+  // return
 };
 
 
