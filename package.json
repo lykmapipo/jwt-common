@@ -1,0 +1,60 @@
+{
+  "name": "@lykmapipo/jwt-common",
+  "version": "0.1.0",
+  "description": "Helper utilities for day to day jwt usage.",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lykmapipo/jwt-common.git"
+  },
+  "keywords": [
+    "lykmapipo",
+    "jwt",
+    "express",
+    "middleware",
+    "token",
+    "utils",
+    "helpers",
+    "auth",
+    "permission",
+    "permits",
+    "check",
+    "guard",
+    "security",
+    "authorization"
+  ],
+  "contributors": [
+    {
+      "name": "lykmapipo",
+      "email": "lallyelias87@gmail.com",
+      "url": "https://github.com/lykmapipo"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lykmapipo/jwt-common/issues",
+    "email": "lallyelias87@gmail.com"
+  },
+  "homepage": "https://github.com/lykmapipo/jwt-common",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "grunt": "^1.0.3",
+    "grunt-contrib-jshint": "^2.0.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-mocha-test": "^0.13.3",
+    "jshint-stylish": "^2.2.1",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "@lykmapipo/env": ">=0.3.3",
+    "async": ">=2.6.1",
+    "lodash": ">=4.17.11"
+  },
+  "engines": {
+    "node": ">=8.11.1",
+    "npm": ">=5.6.0"
+  }
+}
