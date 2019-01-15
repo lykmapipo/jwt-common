@@ -35,6 +35,17 @@ app.get('/users', jwtAuth({ secret }), jwtPermit('user:read'), (req, res, next) 
 
 ```
 
+### Environment
+If below options are available in `process.env` will be used as default.
+```js
+process.env.JWT_SECRET
+process.env.JWT_ALGORITHM
+process.env.JWT_AUDIENCE
+process.env.JWT_ISSUER
+process.env.JWT_SUBJECT
+process.env.JWT_EXPIRES_IN
+```
+
 ## Test
 
 - Clone this repository

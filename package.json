@@ -49,8 +49,10 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
+    "@lykmapipo/common": ">=0.2.0",
     "@lykmapipo/env": ">=0.3.3",
     "async": ">=2.6.1",
+    "jsonwebtoken": ">=8.4.0",
     "lodash": ">=4.17.11"
   },
   "engines": {
