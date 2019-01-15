@@ -5,7 +5,7 @@
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const { parallel, waterfall } = require('async');
-const { compact } = require('@lykmapipo/common');
+const { compact, uniq } = require('@lykmapipo/common');
 const { getString } = require('@lykmapipo/env');
 
 
@@ -289,6 +289,7 @@ const jwtAuth = (optns) => {
  * @function jwtPermit
  * @name jwtPermit
  * @description create middlware to check request for jwt permissions(or scopes).
+ * @param {String[]|...String} requiredScopes required scopes or permissions.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -300,9 +301,39 @@ const jwtAuth = (optns) => {
  *
  * app.get('/users', jwtPermit('user:read'), (req, res, next) => { ... });
  */
-const jwtPermit = ( /*...scopes*/ ) => {
-  // TODO obtain scopes from jwt.scope||jwt.permits||jwt.permissions
-  // TODO obtain scopes from [loader].scope||[loader].permits||[loader].permissions
+const jwtPermit = (...requiredScopes) => {
+
+  // implement jwt permit
+  const _jwtPermit = (request, response, next) => {
+    // obtain user and jwt from request
+    const { user = {}, jwt = {} } = request;
+
+    // obtain scopes
+    const jwtScopes = (jwt.scope || jwt.scopes || jwt.permissions);
+    const userScopes = (user.scope || user.scopes || user.permissions);
+    let givenScopes = [].concat((jwtScopes || userScopes));
+    givenScopes =
+      uniq(_.flattenDeep(givenScopes.map(scope => scope.split(' '))));
+
+    // check for required scopes
+    const permits = uniq([].concat(...requiredScopes));
+    const allowed = permits.some(scope => givenScopes.includes(scope));
+
+    // has scopes
+    if (allowed) {
+      next();
+    }
+    // has no scopes
+    else {
+      let error = new Error('Insufficient Scopes');
+      error.status = 403;
+      next(error);
+    }
+
+  };
+
+  // return
+  return _jwtPermit;
 };
 
 

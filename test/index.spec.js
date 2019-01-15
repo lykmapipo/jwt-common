@@ -19,7 +19,8 @@ const {
   parseJwtFromHttpHeaders,
   parseJwtFromHttpQueryParams,
   parseJwtFromHttpRequest,
-  jwtAuth
+  jwtAuth,
+  jwtPermit
 } = require('../');
 
 
@@ -272,6 +273,35 @@ describe('jwt common', () => {
       expect(request.jwt._id).to.be.equal(payload._id);
       expect(request.jwt.permissions).to.be.eql(payload.permissions);
       done(error);
+    });
+  });
+
+  it('should permit http request with required scopes', (done) => {
+    expect(jwtPermit).to.exist;
+    expect(jwtPermit).to.be.a('function');
+    expect(jwtPermit.name).to.be.equal('jwtPermit');
+
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const request = { jwt: payload };
+    const response = {};
+
+    jwtPermit('user:read')(request, response, (error) => {
+      expect(error).to.not.exist;
+      expect(request.jwt).to.exist;
+      done();
+    });
+  });
+
+  it('should throw insufficient scopes if miss required scopes', (done) => {
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const request = { jwt: payload };
+    const response = {};
+
+    jwtPermit('user:create')(request, response, (error) => {
+      expect(error).to.exist;
+      expect(error.message).to.be.equal('Insufficient Scopes');
+      expect(error.status).to.be.equal(403);
+      done();
     });
   });
 
