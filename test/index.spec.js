@@ -18,7 +18,8 @@ const {
   decode,
   parseJwtFromHttpHeaders,
   parseJwtFromHttpQueryParams,
-  parseJwtFromHttpRequest
+  parseJwtFromHttpRequest,
+  jwtAuth
 } = require('../');
 
 
@@ -232,6 +233,45 @@ describe('jwt common', () => {
       expect(token).to.exist;
       expect(token).to.be.equal(jwt);
       done(error, token);
+    });
+  });
+
+  it('should authorize http request', (done) => {
+    expect(jwtAuth).to.exist;
+    expect(jwtAuth).to.be.a('function');
+    expect(jwtAuth.name).to.be.equal('jwtAuth');
+    expect(jwtAuth.length).to.be.equal(1);
+
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM3MjgwLCJleHAiOjE3Njg0NDA0ODAsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.ZMe4zfu9l8UPM08nMQmRMLZx3rj0AeUNNsGjczMv2A4';
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const request = { headers: { authorization: `Bearer ${jwt}` } };
+    const response = {};
+
+    jwtAuth()(request, response, (error) => {
+      expect(error).to.not.exist;
+      expect(request.jwt).to.exist;
+      expect(request.jwt._id).to.be.equal(payload._id);
+      expect(request.jwt.permissions).to.be.eql(payload.permissions);
+      done(error);
+    });
+  });
+
+  it('should authorize http request with options', (done) => {
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM3NTkyLCJleHAiOjE3Njg0NDA3OTIsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.0dHIXyBV1385t72eZ4GZ_wXaGV2SPh2lfUkw81bCQb4';
+
+    const options = { secret: 'xo67' };
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const request = { headers: { authorization: `Bearer ${jwt}` } };
+    const response = {};
+
+    jwtAuth(options)(request, response, (error) => {
+      expect(error).to.not.exist;
+      expect(request.jwt).to.exist;
+      expect(request.jwt._id).to.be.equal(payload._id);
+      expect(request.jwt.permissions).to.be.eql(payload.permissions);
+      done(error);
     });
   });
 

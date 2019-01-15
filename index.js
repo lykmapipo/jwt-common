@@ -4,7 +4,7 @@
 /* dependencies */
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
-const { parallel } = require('async');
+const { parallel, waterfall } = require('async');
 const { compact } = require('@lykmapipo/common');
 const { getString } = require('@lykmapipo/env');
 
@@ -239,6 +239,7 @@ const parseJwtFromHttpRequest = (request, done) => {
  * @function jwtAuth
  * @name jwtAuth
  * @description create middlware to authorize request using jwt
+ * @param {Object} [opts] jwt verify or decoding options.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -247,11 +248,40 @@ const parseJwtFromHttpRequest = (request, done) => {
  * @public
  * @example
  * const { jwtAuth } = require('@lykmapipo/jwt-common');
- *
- * app.get('/users', jwtAuth(), (req, res, next) => { ... });
+ * const secret = process.env.JWT_SECRET || 'xo67Rw';
+ * app.get('/users', jwtAuth({ secret }), (req, res, next) => { ... });
  */
-const jwtAuth = ( /*optns, loaders*/ ) => {
-  // TODO use loader to fetch user { user: fn, party: fn }
+const jwtAuth = (optns) => {
+
+  // implement jwt authorize middleware
+  const jwtAuthorize = (request, response, next) => {
+
+    // parse jwt from request
+    const parseJwt = next => parseJwtFromHttpRequest(request, next);
+
+    // decode jwt from request
+    const decodeJwt = (token, next) => decode(token, optns, next);
+
+    // run
+    waterfall([parseJwt, decodeJwt], (error, token) => {
+      // handle error
+      if (error) {
+        error.status = (error.status || 403);
+        error.message =
+          (error.message || 'Authorization Header Required');
+        next(error);
+      }
+      // set jwt and continue
+      else {
+        request.jwt = token;
+        next();
+      }
+    });
+
+  };
+
+  // return
+  return jwtAuthorize;
 };
 
 
