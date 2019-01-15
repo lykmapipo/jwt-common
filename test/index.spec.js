@@ -16,7 +16,8 @@ const {
   withDefaults,
   encode,
   decode,
-  parseJwtFromHttpHeaders
+  parseJwtFromHttpHeaders,
+  parseJwtFromHttpQueryParams
 } = require('../');
 
 
@@ -156,6 +157,26 @@ describe('jwt common', () => {
     const request = { headers: { authorization: jwt } };
 
     parseJwtFromHttpHeaders(request, (error, token) => {
+      expect(error).to.not.exist;
+      expect(token).to.exist;
+      expect(token).to.be.equal(jwt);
+      done(error, token);
+    });
+  });
+
+  it('should parse jwt from http query params', (done) => {
+    expect(parseJwtFromHttpQueryParams).to.exist;
+    expect(parseJwtFromHttpQueryParams).to.be.a('function');
+    expect(parseJwtFromHttpQueryParams.name)
+      .to.be.equal('parseJwtFromHttpQueryParams');
+    expect(parseJwtFromHttpQueryParams.length).to.be.equal(2);
+
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
+
+    const request = { query: { token: jwt } };
+
+    parseJwtFromHttpQueryParams(request, (error, token) => {
       expect(error).to.not.exist;
       expect(token).to.exist;
       expect(token).to.be.equal(jwt);

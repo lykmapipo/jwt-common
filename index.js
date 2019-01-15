@@ -123,6 +123,9 @@ const decode = (token, optns, cb) => {
  * @function parseJwtFromHttpHeaders
  * @name parseJwtFromHttpHeaders
  * @description parse request headers to get jwt.
+ * @params {Object} request valid http request object.
+ * @param {Function} done callback to invoke on success or failure.
+ * @return {Payload|Error} jwt if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -163,7 +166,38 @@ const parseJwtFromHttpHeaders = (request, done) => {
   done(null, token);
 };
 
-const parseJwtFromHttpQueryParams = () => {};
+
+/**
+ * @function parseJwtFromHttpQueryParams
+ * @name parseJwtFromHttpQueryParams
+ * @description parse request headers to get jwt.
+ * @params {Object} request valid http request object.
+ * @param {Function} done callback to invoke on success or failure.
+ * @return {Payload|Error} jwt if success or error.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.1.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ * const { parseJwtFromHttpQueryParams } = require('@lykmapipo/jwt-common');
+ * parseJwtFromHttpQueryParams(request, (error, jwt) => { ... });
+ */
+const parseJwtFromHttpQueryParams = (request, done) => {
+  let token;
+
+  // get jwt from request query params
+  token = _.get(request, 'query.token');
+  if (!_.isEmpty(token)) {
+    // delete the token from query params
+    delete request.query.token;
+  }
+
+  // return found token
+  done(null, token);
+};
+
 const parseJwtFromHttpRequest = () => {};
 
 /**
