@@ -17,7 +17,8 @@ const {
   encode,
   decode,
   parseJwtFromHttpHeaders,
-  parseJwtFromHttpQueryParams
+  parseJwtFromHttpQueryParams,
+  parseJwtFromHttpRequest
 } = require('../');
 
 
@@ -183,4 +184,55 @@ describe('jwt common', () => {
       done(error, token);
     });
   });
+
+  it('should parse jwt from http request', (done) => {
+    expect(parseJwtFromHttpRequest).to.exist;
+    expect(parseJwtFromHttpRequest).to.be.a('function');
+    expect(parseJwtFromHttpRequest.name)
+      .to.be.equal('parseJwtFromHttpRequest');
+    expect(parseJwtFromHttpRequest.length).to.be.equal(2);
+
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
+
+    const request = { headers: { authorization: `Bearer ${jwt}` } };
+
+    parseJwtFromHttpRequest(request, (error, token) => {
+      expect(error).to.not.exist;
+      expect(token).to.exist;
+      expect(token).to.be.equal(jwt);
+      done(error, token);
+    });
+  });
+
+  it('should parse jwt from http request', (done) => {
+
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
+
+    const request = { headers: { authorization: jwt } };
+
+    parseJwtFromHttpRequest(request, (error, token) => {
+      expect(error).to.not.exist;
+      expect(token).to.exist;
+      expect(token).to.be.equal(jwt);
+      done(error, token);
+    });
+  });
+
+  it('should parse jwt from http request', (done) => {
+
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
+
+    const request = { query: { token: jwt } };
+
+    parseJwtFromHttpRequest(request, (error, token) => {
+      expect(error).to.not.exist;
+      expect(token).to.exist;
+      expect(token).to.be.equal(jwt);
+      done(error, token);
+    });
+  });
+
 });

@@ -4,6 +4,7 @@
 /* dependencies */
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
+const { parallel } = require('async');
 const { compact } = require('@lykmapipo/common');
 const { getString } = require('@lykmapipo/env');
 
@@ -198,7 +199,41 @@ const parseJwtFromHttpQueryParams = (request, done) => {
   done(null, token);
 };
 
-const parseJwtFromHttpRequest = () => {};
+
+/**
+ * @function parseJwtFromHttpRequest
+ * @name parseJwtFromHttpRequest
+ * @description parse request headers to get jwt.
+ * @params {Object} request valid http request object.
+ * @param {Function} done callback to invoke on success or failure.
+ * @return {Payload|Error} jwt if success or error.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.1.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ * const { parseJwtFromHttpRequest } = require('@lykmapipo/jwt-common');
+ * parseJwtFromHttpRequest(request, (error, jwt) => { ... });
+ */
+const parseJwtFromHttpRequest = (request, done) => {
+  // parse for jwt from request headers and query params
+  parallel({
+    headerToken: next => parseJwtFromHttpHeaders(request, next),
+    urlToken: next => parseJwtFromHttpQueryParams(request, next)
+  }, (error, results = {}) => {
+    // collect parsed header
+    const { headerToken, urlToken } = results;
+    const token = (headerToken || urlToken);
+    if (_.isEmpty(token)) {
+      done(new Error('Authorization Header Required'));
+    } else {
+      done(null, token);
+    }
+  });
+};
+
 
 /**
  * @function jwtAuth
