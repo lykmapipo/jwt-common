@@ -86,7 +86,7 @@ const encode = (payload, optns, cb) => {
  * @function decode
  * @name decode
  * @description decode and verify given jwt.
- * @param {String} tokn jwt token to decode.
+ * @param {String} token jwt token to decode.
  * @param {Object} [opts] jwt verify or decoding options.
  * @param {Function} cb callback to invoke on success or failure.
  * @return {Payload|Error} payload if success or error.
@@ -119,5 +119,102 @@ const decode = (token, optns, cb) => {
 };
 
 
+/**
+ * @function parseJwtFromHttpHeaders
+ * @name parseJwtFromHttpHeaders
+ * @description parse request headers to get jwt.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.1.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ * const { parseJwtFromHttpHeaders } = require('@lykmapipo/jwt-common');
+ * parseJwtFromHttpHeaders(request, (error, jwt) => { ... });
+ */
+const parseJwtFromHttpHeaders = (request, done) => {
+  let token;
+
+  // get authorization header
+  const authorization =
+    (_.get(request, 'headers.authorization') ||
+      _.get(request, 'headers.Authorization'));
+
+  // parse jwt from header
+  if (!_.isEmpty(authorization)) {
+
+    // split authorization headers
+    const parts = authorization.split(' ');
+    const scheme = parts[0];
+
+    // is token in the form of Bearer token
+    if (/^Bearer$/i.test(scheme)) {
+      token = parts[1];
+    }
+
+    // no its just a token
+    else {
+      token = parts[0];
+    }
+  }
+
+  // return found token
+  done(null, token);
+};
+
+const parseJwtFromHttpQueryParams = () => {};
+const parseJwtFromHttpRequest = () => {};
+
+/**
+ * @function jwtAuth
+ * @name jwtAuth
+ * @description create middlware to authorize request using jwt
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.1.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ * const { jwtAuth } = require('@lykmapipo/jwt-common');
+ *
+ * app.get('/users', jwtAuth(), (req, res, next) => { ... });
+ */
+const jwtAuth = ( /*optns, loaders*/ ) => {
+  // TODO use loader to fetch user { user: fn, party: fn }
+};
+
+
+/**
+ * @function jwtPermit
+ * @name jwtPermit
+ * @description create middlware to check request for jwt permissions(or scopes).
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.1.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ * const { jwtPermit } = require('@lykmapipo/jwt-common');
+ *
+ * app.get('/users', jwtPermit('user:read'), (req, res, next) => { ... });
+ */
+const jwtPermit = ( /*...scopes*/ ) => {
+  // TODO obtain scopes from jwt.scope||jwt.permits||jwt.permissions
+  // TODO obtain scopes from [loader].scope||[loader].permits||[loader].permissions
+};
+
+
 /* export */
-module.exports = exports = { withDefaults, encode, decode };
+module.exports = exports = {
+  withDefaults,
+  encode,
+  decode,
+  parseJwtFromHttpHeaders,
+  parseJwtFromHttpQueryParams,
+  parseJwtFromHttpRequest,
+  jwtAuth,
+  jwtPermit
+};

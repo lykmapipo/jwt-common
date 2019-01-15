@@ -12,7 +12,12 @@ process.env.JWT_EXPIRES_IN = '7y';
 /* dependencies */
 const { waterfall } = require('async');
 const { expect } = require('chai');
-const { withDefaults, encode, decode } = require('../');
+const {
+  withDefaults,
+  encode,
+  decode,
+  parseJwtFromHttpHeaders
+} = require('../');
 
 
 describe('jwt common', () => {
@@ -121,6 +126,40 @@ describe('jwt common', () => {
       expect(decoded.iss).to.be.equal('issuer');
       expect(decoded.sub).to.be.equal('sub');
       done(error, decoded);
+    });
+  });
+
+  it('should parse jwt from http headers', (done) => {
+    expect(parseJwtFromHttpHeaders).to.exist;
+    expect(parseJwtFromHttpHeaders).to.be.a('function');
+    expect(parseJwtFromHttpHeaders.name)
+      .to.be.equal('parseJwtFromHttpHeaders');
+    expect(parseJwtFromHttpHeaders.length).to.be.equal(2);
+
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
+
+    const request = { headers: { authorization: `Bearer ${jwt}` } };
+
+    parseJwtFromHttpHeaders(request, (error, token) => {
+      expect(error).to.not.exist;
+      expect(token).to.exist;
+      expect(token).to.be.equal(jwt);
+      done(error, token);
+    });
+  });
+
+  it('should parse jwt from http headers', (done) => {
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
+
+    const request = { headers: { authorization: jwt } };
+
+    parseJwtFromHttpHeaders(request, (error, token) => {
+      expect(error).to.not.exist;
+      expect(token).to.exist;
+      expect(token).to.be.equal(jwt);
+      done(error, token);
     });
   });
 });
