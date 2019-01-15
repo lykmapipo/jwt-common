@@ -65,7 +65,7 @@ const withDefaults = (optns) => {
  */
 const encode = (payload, optns, cb) => {
   // normalize arguments
-  const options = _.isFunction(optns) ? {} : exports.withDefaults({}, optns);
+  const options = exports.withDefaults(_.isFunction(optns) ? {} : optns);
   const done = _.isFunction(optns) ? optns : cb;
 
   // ensure payload

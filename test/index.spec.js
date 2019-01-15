@@ -2,6 +2,11 @@
 
 
 process.env.NODE_ENV = 'test';
+process.env.JWT_SECRET = 'secret';
+process.env.JWT_AUDIENCE = 'audience';
+process.env.JWT_ISSUER = 'issuer';
+process.env.JWT_SUBJECT = 'subject';
+process.env.JWT_EXPIRES_IN = '7y';
 
 
 /* dependencies */
@@ -17,13 +22,6 @@ describe('jwt common', () => {
     expect(withDefaults.name).to.be.equal('withDefaults');
     expect(withDefaults.length).to.be.equal(1);
 
-    // set process.env
-    process.env.JWT_SECRET = 'secret';
-    process.env.JWT_AUDIENCE = 'audience';
-    process.env.JWT_ISSUER = 'issuer';
-    process.env.JWT_SUBJECT = 'subject';
-    process.env.JWT_EXPIRES_IN = '7y';
-
     const options = withDefaults();
     expect(options.secret).to.be.equal('secret');
     expect(options.algorithm).to.be.equal('HS256');
@@ -31,18 +29,49 @@ describe('jwt common', () => {
     expect(options.issuer).to.be.equal('issuer');
     expect(options.subject).to.be.equal('subject');
     expect(options.expiresIn).to.be.equal('7y');
-
-    // clear process.env
-    delete process.env.JWT_SECRET;
-    delete process.env.JWT_AUDIENCE;
-    delete process.env.JWT_ISSUER;
-    delete process.env.JWT_SUBJECT;
-    delete process.env.JWT_EXPIRES_IN;
   });
 
   it('should encode given payload', (done) => {
     expect(encode).to.exist;
-    done();
+    expect(encode).to.be.a('function');
+    expect(encode.name).to.be.equal('encode');
+    expect(encode.length).to.be.equal(3);
+
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    encode(payload, (error, jwt) => {
+      expect(error).to.not.exist;
+      expect(jwt).to.exist;
+      done(error, jwt);
+    });
+  });
+
+  it('should encode given payload with privide options', (done) => {
+    expect(encode).to.exist;
+    expect(encode).to.be.a('function');
+    expect(encode.name).to.be.equal('encode');
+    expect(encode.length).to.be.equal(3);
+
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const options = { secret: 'xo67' };
+    encode(payload, options, (error, jwt) => {
+      expect(error).to.not.exist;
+      expect(jwt).to.exist;
+      done(error, jwt);
+    });
+  });
+
+  it('should throw if encode empty payload', (done) => {
+    expect(encode).to.exist;
+    expect(encode).to.be.a('function');
+    expect(encode.name).to.be.equal('encode');
+    expect(encode.length).to.be.equal(3);
+
+    encode({}, (error, jwt) => {
+      expect(error).to.exist;
+      expect(jwt).to.not.exist;
+      expect(error.message).to.be.equal('payload is required');
+      done();
+    });
   });
 
   it('should decode given payload', (done) => {
