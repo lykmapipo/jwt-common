@@ -1,3 +1,9 @@
+#### 0.2.0 (2019-01-21)
+
+##### New Features
+
+*  allow jwt to user decoder options on jwtAuth ([c761df1b](https://github.com/lykmapipo/jwt-common/commit/c761df1ba9b135c413ff9029fc2604dec39865d6))
+
 #### 0.1.0 (2019-01-15)
 
 ##### Chores
