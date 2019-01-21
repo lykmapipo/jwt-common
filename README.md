@@ -30,8 +30,9 @@ decode(token, (error, jwt) => { ... });
 const { jwtAuth, jwtPermit } = require('@lykmapipo/jwt-common');
 const secret = process.env.JWT_SECRET || 'secret';
 
-app.get('/users', jwtAuth({ secret }), (req, res, next) => { ... });
-app.get('/users', jwtAuth({ secret }), jwtPermit('user:read'), (req, res, next) => { ... });
+const user = (token, next) => fetchUser(token._id, next);
+app.get('/users', jwtAuth({ secret, user }), (req, res, next) => { ... });
+app.get('/users', jwtAuth({ secret, user }), jwtPermit('user:read'), (req, res, next) => { ... });
 
 ```
 

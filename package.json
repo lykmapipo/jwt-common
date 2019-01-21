@@ -1,6 +1,6 @@
 {
   "name": "@lykmapipo/jwt-common",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Helper utilities for day to day jwt usage.",
   "main": "index.js",
   "scripts": {

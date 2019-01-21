@@ -79,7 +79,6 @@ const encode = (payload, optns, cb) => {
 
   // generate jwt
   jwt.sign(payload, secret, rest, done);
-
 };
 
 
@@ -115,8 +114,36 @@ const decode = (token, optns, cb) => {
 
   // decode and verify
   jwt.verify(token, secret, rest, done);
+};
 
-  // return
+
+/**
+ * @function decodeJwtToUser
+ * @name decodeJwtToUser
+ * @description return a function used to decode jwt to user.
+ * @param {Object} [opts] decoding options.
+ * @param {Functon} [opts.user]
+ * @return {Function} jwt to user decoder
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.2.0
+ * @version 0.1.0
+ * @private
+ */
+const decodeJwtToUser = (optns) => {
+  // normalize arguments
+  const options = withDefaults(optns);
+
+  // obtain jwt to user decoder
+  const { user = (token, next) => next(null, null) } = options;
+
+  // wrap decoder
+  const decodeToUser = (token, next) => {
+    user(token, (error, user) => next(error, token, user));
+  };
+
+  // return jwt to user decoder
+  return decodeToUser;
 };
 
 
@@ -263,7 +290,9 @@ const jwtAuth = (optns) => {
     const decodeJwt = (token, next) => decode(token, optns, next);
 
     // run
-    waterfall([parseJwt, decodeJwt], (error, token) => {
+    waterfall([
+      parseJwt, decodeJwt, decodeJwtToUser(optns)
+    ], (error, token, user) => {
       // handle error
       if (error) {
         error.status = (error.status || 403);
@@ -274,6 +303,7 @@ const jwtAuth = (optns) => {
       // set jwt and continue
       else {
         request.jwt = token;
+        request.user = user;
         next();
       }
     });
@@ -311,7 +341,7 @@ const jwtPermit = (...requiredScopes) => {
     // obtain scopes
     const jwtScopes = (jwt.scope || jwt.scopes || jwt.permissions);
     const userScopes = (user.scope || user.scopes || user.permissions);
-    let givenScopes = [].concat((jwtScopes || userScopes));
+    let givenScopes = [].concat((userScopes || jwtScopes));
     givenScopes =
       uniq(_.flattenDeep(givenScopes.map(scope => scope.split(' '))));
 

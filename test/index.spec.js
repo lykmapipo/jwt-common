@@ -276,6 +276,27 @@ describe('jwt common', () => {
     });
   });
 
+  it('should authorize http request and decode jwt to user', (done) => {
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM3NTkyLCJleHAiOjE3Njg0NDA3OTIsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.0dHIXyBV1385t72eZ4GZ_wXaGV2SPh2lfUkw81bCQb4';
+
+    const user = (token, next) => next(null, { name: 'user' });
+    const options = { secret: 'xo67', user: user };
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const request = { headers: { authorization: `Bearer ${jwt}` } };
+    const response = {};
+
+    jwtAuth(options)(request, response, (error) => {
+      expect(error).to.not.exist;
+      expect(request.jwt).to.exist;
+      expect(request.jwt._id).to.be.equal(payload._id);
+      expect(request.user).to.exist;
+      expect(request.user).to.be.eql({ name: 'user' });
+      expect(request.jwt.permissions).to.be.eql(payload.permissions);
+      done(error);
+    });
+  });
+
   it('should permit http request with required scopes', (done) => {
     expect(jwtPermit).to.exist;
     expect(jwtPermit).to.be.a('function');
