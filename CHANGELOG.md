@@ -1,3 +1,9 @@
+#### 0.2.1 (2019-02-25)
+
+##### Bug Fixes
+
+*  jwtAuth error code to 401 & jwtPermit error code to 403 ([cc7f6f54](https://github.com/lykmapipo/jwt-common/commit/cc7f6f5457b3844e67379cf94b77641645eec289))
+
 #### 0.2.0 (2019-01-21)
 
 ##### New Features
