@@ -254,7 +254,10 @@ const parseJwtFromHttpRequest = (request, done) => {
     const { headerToken, urlToken } = results;
     const token = (headerToken || urlToken);
     if (_.isEmpty(token)) {
-      done(new Error('Authorization Header Required'));
+      error = error || new Error('Unauthorized');
+      error.status = (error.status || 401);
+      error.message = (error.message || 'Unauthorized');
+      done(error);
     } else {
       done(null, token);
     }
@@ -295,9 +298,8 @@ const jwtAuth = (optns) => {
     ], (error, token, user) => {
       // handle error
       if (error) {
-        error.status = (error.status || 403);
-        error.message =
-          (error.message || 'Authorization Header Required');
+        error.status = (error.status || 401);
+        error.message = (error.message || 'Unauthorized');
         next(error);
       }
       // set jwt and continue
@@ -355,7 +357,7 @@ const jwtPermit = (...requiredScopes) => {
     }
     // has no scopes
     else {
-      let error = new Error('Insufficient Scopes');
+      let error = new Error('Forbidden');
       error.status = 403;
       next(error);
     }
