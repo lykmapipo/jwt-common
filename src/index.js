@@ -1,13 +1,8 @@
-'use strict';
-
-
-/* dependencies */
-const _ = require('lodash');
-const jwt = require('jsonwebtoken');
-const { parallel, waterfall } = require('async');
-const { compact, uniq } = require('@lykmapipo/common');
-const { getString } = require('@lykmapipo/env');
-
+import _ from 'lodash';
+import { sign, verify } from 'jsonwebtoken';
+import { parallel, waterfall } from 'async';
+import { compact, uniq } from '@lykmapipo/common';
+import { getString } from '@lykmapipo/env';
 
 /**
  * @function withDefaults
@@ -25,22 +20,25 @@ const { getString } = require('@lykmapipo/env');
  * const { withDefaults } = require('@lykmapipo/jwt-common');
  * withDefaults({ secret: 'xo67Rw' }) // => { secret: 'xo67Rw', ...}
  */
-const withDefaults = (optns) => {
+export const withDefaults = optns => {
   // merge defaults
-  let options = _.merge({}, {
-    secret: getString('JWT_SECRET'),
-    algorithm: getString('JWT_ALGORITHM', 'HS256'),
-    audience: getString('JWT_AUDIENCE'),
-    issuer: getString('JWT_ISSUER'),
-    subject: getString('JWT_SUBJECT'),
-    expiresIn: getString('JWT_EXPIRES_IN'),
-  }, optns);
+  let options = _.merge(
+    {},
+    {
+      secret: getString('JWT_SECRET'),
+      algorithm: getString('JWT_ALGORITHM', 'HS256'),
+      audience: getString('JWT_AUDIENCE'),
+      issuer: getString('JWT_ISSUER'),
+      subject: getString('JWT_SUBJECT'),
+      expiresIn: getString('JWT_EXPIRES_IN'),
+    },
+    optns
+  );
 
   // compact and return
   options = compact(options);
   return options;
 };
-
 
 /**
  * @function encode
@@ -64,7 +62,7 @@ const withDefaults = (optns) => {
  * encode(payload, (error, jwt) => { ...});
  * encode(payload, { secret }, (error, jwt) => { ...});
  */
-const encode = (payload, optns, cb) => {
+export const encode = (payload, optns, cb) => {
   // normalize arguments
   const options = withDefaults(_.isFunction(optns) ? {} : optns);
   const done = _.isFunction(optns) ? optns : cb;
@@ -78,9 +76,8 @@ const encode = (payload, optns, cb) => {
   const { secret, ...rest } = options;
 
   // generate jwt
-  jwt.sign(payload, secret, rest, done);
+  return sign(payload, secret, rest, done);
 };
-
 
 /**
  * @function decode
@@ -104,7 +101,7 @@ const encode = (payload, optns, cb) => {
  * decode(token, (error, payload) => { ...});
  * decode(token, { secret }, (error, payload) => { ...});
  */
-const decode = (token, optns, cb) => {
+export const decode = (token, optns, cb) => {
   // normalize arguments
   const options = withDefaults(_.isFunction(optns) ? {} : optns);
   const done = _.isFunction(optns) ? optns : cb;
@@ -113,9 +110,8 @@ const decode = (token, optns, cb) => {
   const { secret, ...rest } = options;
 
   // decode and verify
-  jwt.verify(token, secret, rest, done);
+  verify(token, secret, rest, done);
 };
-
 
 /**
  * @function decodeJwtToUser
@@ -130,7 +126,7 @@ const decode = (token, optns, cb) => {
  * @version 0.1.0
  * @private
  */
-const decodeJwtToUser = (optns) => {
+export const decodeJwtToUser = optns => {
   // normalize arguments
   const options = withDefaults(optns);
 
@@ -139,13 +135,12 @@ const decodeJwtToUser = (optns) => {
 
   // wrap decoder
   const decodeToUser = (token, next) => {
-    user(token, (error, user) => next(error, token, user));
+    user(token, (error, foundUser) => next(error, token, foundUser));
   };
 
   // return jwt to user decoder
   return decodeToUser;
 };
-
 
 /**
  * @function parseJwtFromHttpHeaders
@@ -164,36 +159,34 @@ const decodeJwtToUser = (optns) => {
  * const { parseJwtFromHttpHeaders } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpHeaders(request, (error, jwt) => { ... });
  */
-const parseJwtFromHttpHeaders = (request, done) => {
+export const parseJwtFromHttpHeaders = (request, done) => {
   let token;
 
   // get authorization header
   const authorization =
-    (_.get(request, 'headers.authorization') ||
-      _.get(request, 'headers.Authorization'));
+    _.get(request, 'headers.authorization') ||
+    _.get(request, 'headers.Authorization');
 
   // parse jwt from header
   if (!_.isEmpty(authorization)) {
-
     // split authorization headers
     const parts = authorization.split(' ');
-    const scheme = parts[0];
+    const [scheme, parsedToken] = parts;
 
     // is token in the form of Bearer token
     if (/^Bearer$/i.test(scheme)) {
-      token = parts[1];
+      token = parsedToken;
     }
 
     // no its just a token
     else {
-      token = parts[0];
+      token = scheme;
     }
   }
 
   // return found token
   done(null, token);
 };
-
 
 /**
  * @function parseJwtFromHttpQueryParams
@@ -212,11 +205,9 @@ const parseJwtFromHttpHeaders = (request, done) => {
  * const { parseJwtFromHttpQueryParams } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpQueryParams(request, (error, jwt) => { ... });
  */
-const parseJwtFromHttpQueryParams = (request, done) => {
-  let token;
-
+export const parseJwtFromHttpQueryParams = (request, done) => {
   // get jwt from request query params
-  token = _.get(request, 'query.token');
+  const token = _.get(request, 'query.token');
   if (!_.isEmpty(token)) {
     // delete the token from query params
     delete request.query.token;
@@ -225,7 +216,6 @@ const parseJwtFromHttpQueryParams = (request, done) => {
   // return found token
   done(null, token);
 };
-
 
 /**
  * @function parseJwtFromHttpRequest
@@ -244,26 +234,28 @@ const parseJwtFromHttpQueryParams = (request, done) => {
  * const { parseJwtFromHttpRequest } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpRequest(request, (error, jwt) => { ... });
  */
-const parseJwtFromHttpRequest = (request, done) => {
+export const parseJwtFromHttpRequest = (request, done) => {
   // parse for jwt from request headers and query params
-  parallel({
-    headerToken: next => parseJwtFromHttpHeaders(request, next),
-    urlToken: next => parseJwtFromHttpQueryParams(request, next)
-  }, (error, results = {}) => {
-    // collect parsed header
-    const { headerToken, urlToken } = results;
-    const token = (headerToken || urlToken);
-    if (_.isEmpty(token)) {
-      error = error || new Error('Unauthorized');
-      error.status = (error.status || 401);
-      error.message = (error.message || 'Unauthorized');
-      done(error);
-    } else {
-      done(null, token);
+  parallel(
+    {
+      headerToken: next => parseJwtFromHttpHeaders(request, next),
+      urlToken: next => parseJwtFromHttpQueryParams(request, next),
+    },
+    (error, results = {}) => {
+      // collect parsed header
+      const { headerToken, urlToken } = results;
+      const token = headerToken || urlToken;
+      if (error || _.isEmpty(token)) {
+        error = error || new Error('Unauthorized'); //eslint-disable-line
+        error.status = error.status || 401; //eslint-disable-line
+        error.message = error.message || 'Unauthorized'; //eslint-disable-line
+        done(error);
+      } else {
+        done(null, token);
+      }
     }
-  });
+  );
 };
-
 
 /**
  * @function jwtAuth
@@ -281,41 +273,38 @@ const parseJwtFromHttpRequest = (request, done) => {
  * const secret = process.env.JWT_SECRET || 'xo67Rw';
  * app.get('/users', jwtAuth({ secret }), (req, res, next) => { ... });
  */
-const jwtAuth = (optns) => {
-
+export const jwtAuth = optns => {
   // implement jwt authorize middleware
   const jwtAuthorize = (request, response, next) => {
-
     // parse jwt from request
-    const parseJwt = next => parseJwtFromHttpRequest(request, next);
+    const parseJwt = cb => parseJwtFromHttpRequest(request, cb);
 
     // decode jwt from request
-    const decodeJwt = (token, next) => decode(token, optns, next);
+    const decodeJwt = (token, cb) => decode(token, optns, cb);
 
     // run
-    waterfall([
-      parseJwt, decodeJwt, decodeJwtToUser(optns)
-    ], (error, token, user) => {
-      // handle error
-      if (error) {
-        error.status = (error.status || 401);
-        error.message = (error.message || 'Unauthorized');
-        next(error);
+    waterfall(
+      [parseJwt, decodeJwt, decodeJwtToUser(optns)],
+      (error, token, user) => {
+        // handle error
+        if (error) {
+          error.status = error.status || 401; //eslint-disable-line
+          error.message = error.message || 'Unauthorized'; //eslint-disable-line
+          next(error);
+        }
+        // set jwt and continue
+        else {
+          request.jwt = token;
+          request.user = user;
+          next();
+        }
       }
-      // set jwt and continue
-      else {
-        request.jwt = token;
-        request.user = user;
-        next();
-      }
-    });
-
+    );
   };
 
   // return
   return jwtAuthorize;
 };
-
 
 /**
  * @function jwtPermit
@@ -333,19 +322,19 @@ const jwtAuth = (optns) => {
  *
  * app.get('/users', jwtPermit('user:read'), (req, res, next) => { ... });
  */
-const jwtPermit = (...requiredScopes) => {
-
+export const jwtPermit = (...requiredScopes) => {
   // implement jwt permit
-  const _jwtPermit = (request, response, next) => {
+  const checkJwtPermit = (request, response, next) => {
     // obtain user and jwt from request
     const { user = {}, jwt = {} } = request;
 
     // obtain scopes
-    const jwtScopes = (jwt.scope || jwt.scopes || jwt.permissions);
-    const userScopes = (user.scope || user.scopes || user.permissions);
-    let givenScopes = [].concat((userScopes || jwtScopes));
-    givenScopes =
-      uniq(_.flattenDeep(givenScopes.map(scope => scope.split(' '))));
+    const jwtScopes = jwt.scope || jwt.scopes || jwt.permissions;
+    const userScopes = user.scope || user.scopes || user.permissions;
+    let givenScopes = [].concat(userScopes || jwtScopes);
+    givenScopes = uniq(
+      _.flattenDeep(givenScopes.map(scope => scope.split(' ')))
+    );
 
     // check for required scopes
     const permits = uniq([].concat(...requiredScopes));
@@ -357,26 +346,12 @@ const jwtPermit = (...requiredScopes) => {
     }
     // has no scopes
     else {
-      let error = new Error('Forbidden');
+      const error = new Error('Forbidden');
       error.status = 403;
       next(error);
     }
-
   };
 
   // return
-  return _jwtPermit;
-};
-
-
-/* export */
-module.exports = exports = {
-  withDefaults,
-  encode,
-  decode,
-  parseJwtFromHttpHeaders,
-  parseJwtFromHttpQueryParams,
-  parseJwtFromHttpRequest,
-  jwtAuth,
-  jwtPermit
+  return checkJwtPermit;
 };

@@ -1,18 +1,6 @@
-'use strict';
-
-
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'secret';
-process.env.JWT_AUDIENCE = 'audience';
-process.env.JWT_ISSUER = 'issuer';
-process.env.JWT_SUBJECT = 'subject';
-process.env.JWT_EXPIRES_IN = '7y';
-
-
-/* dependencies */
-const { waterfall } = require('async');
-const { expect } = require('chai');
-const {
+import { waterfall } from 'async';
+import { expect } from 'chai';
+import {
   withDefaults,
   encode,
   decode,
@@ -20,11 +8,16 @@ const {
   parseJwtFromHttpQueryParams,
   parseJwtFromHttpRequest,
   jwtAuth,
-  jwtPermit
-} = require('../');
-
+  jwtPermit,
+} from '../src/index';
 
 describe('jwt common', () => {
+  process.env.NODE_ENV = 'test';
+  process.env.JWT_SECRET = 'secret';
+  process.env.JWT_AUDIENCE = 'audience';
+  process.env.JWT_ISSUER = 'issuer';
+  process.env.JWT_SUBJECT = 'subject';
+  process.env.JWT_EXPIRES_IN = '7y';
 
   it('should merge options with defaults', () => {
     expect(withDefaults).to.exist;
@@ -91,21 +84,21 @@ describe('jwt common', () => {
     expect(decode.length).to.be.equal(3);
 
     const payload = { _id: 'xo5', permissions: ['user:read'] };
-    waterfall([
-      (next) => encode(payload, next),
-      (jwt, next) => decode(jwt, next)
-    ], (error, decoded) => {
-      expect(error).to.not.exist;
-      expect(decoded).to.exist;
-      expect(decoded._id).to.be.equal(payload._id);
-      expect(decoded.permissions).to.be.eql(payload.permissions);
-      expect(decoded.iat).to.exist;
-      expect(decoded.exp).to.exist;
-      expect(decoded.aud).to.be.equal('audience');
-      expect(decoded.iss).to.be.equal('issuer');
-      expect(decoded.sub).to.be.equal('subject');
-      done(error, decoded);
-    });
+    waterfall(
+      [next => encode(payload, next), (jwt, next) => decode(jwt, next)],
+      (error, decoded) => {
+        expect(error).to.not.exist;
+        expect(decoded).to.exist;
+        expect(decoded._id).to.be.equal(payload._id);
+        expect(decoded.permissions).to.be.eql(payload.permissions);
+        expect(decoded.iat).to.exist;
+        expect(decoded.exp).to.exist;
+        expect(decoded.aud).to.be.equal('audience');
+        expect(decoded.iss).to.be.equal('issuer');
+        expect(decoded.sub).to.be.equal('subject');
+        done(error, decoded);
+      }
+    );
   });
 
   it('should decode given payload with provided options', done => {
@@ -116,28 +109,30 @@ describe('jwt common', () => {
 
     const payload = { _id: 'xo5', permissions: ['user:read'] };
     const options = { secret: 'xo67', subject: 'sub', audience: 'aud' };
-    waterfall([
-      (next) => encode(payload, options, next),
-      (jwt, next) => decode(jwt, options, next)
-    ], (error, decoded) => {
-      expect(error).to.not.exist;
-      expect(decoded).to.exist;
-      expect(decoded._id).to.be.equal(payload._id);
-      expect(decoded.permissions).to.be.eql(payload.permissions);
-      expect(decoded.iat).to.exist;
-      expect(decoded.exp).to.exist;
-      expect(decoded.aud).to.be.equal('aud');
-      expect(decoded.iss).to.be.equal('issuer');
-      expect(decoded.sub).to.be.equal('sub');
-      done(error, decoded);
-    });
+    waterfall(
+      [
+        next => encode(payload, options, next),
+        (jwt, next) => decode(jwt, options, next),
+      ],
+      (error, decoded) => {
+        expect(error).to.not.exist;
+        expect(decoded).to.exist;
+        expect(decoded._id).to.be.equal(payload._id);
+        expect(decoded.permissions).to.be.eql(payload.permissions);
+        expect(decoded.iat).to.exist;
+        expect(decoded.exp).to.exist;
+        expect(decoded.aud).to.be.equal('aud');
+        expect(decoded.iss).to.be.equal('issuer');
+        expect(decoded.sub).to.be.equal('sub');
+        done(error, decoded);
+      }
+    );
   });
 
   it('should parse jwt from http headers', done => {
     expect(parseJwtFromHttpHeaders).to.exist;
     expect(parseJwtFromHttpHeaders).to.be.a('function');
-    expect(parseJwtFromHttpHeaders.name)
-      .to.be.equal('parseJwtFromHttpHeaders');
+    expect(parseJwtFromHttpHeaders.name).to.be.equal('parseJwtFromHttpHeaders');
     expect(parseJwtFromHttpHeaders.length).to.be.equal(2);
 
     const jwt =
@@ -170,8 +165,9 @@ describe('jwt common', () => {
   it('should parse jwt from http query params', done => {
     expect(parseJwtFromHttpQueryParams).to.exist;
     expect(parseJwtFromHttpQueryParams).to.be.a('function');
-    expect(parseJwtFromHttpQueryParams.name)
-      .to.be.equal('parseJwtFromHttpQueryParams');
+    expect(parseJwtFromHttpQueryParams.name).to.be.equal(
+      'parseJwtFromHttpQueryParams'
+    );
     expect(parseJwtFromHttpQueryParams.length).to.be.equal(2);
 
     const jwt =
@@ -190,8 +186,7 @@ describe('jwt common', () => {
   it('should parse jwt from http request', done => {
     expect(parseJwtFromHttpRequest).to.exist;
     expect(parseJwtFromHttpRequest).to.be.a('function');
-    expect(parseJwtFromHttpRequest.name)
-      .to.be.equal('parseJwtFromHttpRequest');
+    expect(parseJwtFromHttpRequest.name).to.be.equal('parseJwtFromHttpRequest');
     expect(parseJwtFromHttpRequest.length).to.be.equal(2);
 
     const jwt =
@@ -208,7 +203,6 @@ describe('jwt common', () => {
   });
 
   it('should parse jwt from http request', done => {
-
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
 
@@ -223,7 +217,6 @@ describe('jwt common', () => {
   });
 
   it('should parse jwt from http request', done => {
-
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
 
@@ -249,7 +242,7 @@ describe('jwt common', () => {
     const request = { headers: { authorization: `Bearer ${jwt}` } };
     const response = {};
 
-    jwtAuth()(request, response, (error) => {
+    jwtAuth()(request, response, error => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       expect(request.jwt._id).to.be.equal(payload._id);
@@ -267,7 +260,7 @@ describe('jwt common', () => {
     const request = { headers: { authorization: `Bearer ${jwt}` } };
     const response = {};
 
-    jwtAuth(options)(request, response, (error) => {
+    jwtAuth(options)(request, response, error => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       expect(request.jwt._id).to.be.equal(payload._id);
@@ -281,12 +274,12 @@ describe('jwt common', () => {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM3NTkyLCJleHAiOjE3Njg0NDA3OTIsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.0dHIXyBV1385t72eZ4GZ_wXaGV2SPh2lfUkw81bCQb4';
 
     const user = (token, next) => next(null, { name: 'user' });
-    const options = { secret: 'xo67', user: user };
+    const options = { secret: 'xo67', user };
     const payload = { _id: 'xo5', permissions: ['user:read'] };
     const request = { headers: { authorization: `Bearer ${jwt}` } };
     const response = {};
 
-    jwtAuth(options)(request, response, (error) => {
+    jwtAuth(options)(request, response, error => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       expect(request.jwt._id).to.be.equal(payload._id);
@@ -301,7 +294,7 @@ describe('jwt common', () => {
     const request = {};
     const response = {};
 
-    jwtAuth()(request, response, (error) => {
+    jwtAuth()(request, response, error => {
       expect(error).to.exist;
       expect(error.message).to.be.equal('Unauthorized');
       expect(error.status).to.be.equal(401);
@@ -318,7 +311,7 @@ describe('jwt common', () => {
     const request = { jwt: payload };
     const response = {};
 
-    jwtPermit('user:read')(request, response, (error) => {
+    jwtPermit('user:read')(request, response, error => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       done();
@@ -330,12 +323,11 @@ describe('jwt common', () => {
     const request = { jwt: payload };
     const response = {};
 
-    jwtPermit('user:create')(request, response, (error) => {
+    jwtPermit('user:create')(request, response, error => {
       expect(error).to.exist;
       expect(error.message).to.be.equal('Forbidden');
       expect(error.status).to.be.equal(403);
       done();
     });
   });
-
 });
