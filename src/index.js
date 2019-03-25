@@ -101,12 +101,16 @@ export const encode = (payload, optns, cb) => {
  * @static
  * @public
  * @example
+ *
  * const { decode } = require('@lykmapipo/jwt-common');
  *
- * const secret = process.env.JWT_SECRET || 'xo67Rw';
  * const payload = { _id: 'xo5', permissions: ['user:read'] };
- * decode(token, (error, payload) => { ...});
- * decode(token, { secret }, (error, payload) => { ...});
+ *
+ * // decode with default options
+ * decode(token, (error, payload) => { ... });
+ *
+ * // decode with provided options
+ * decode(token, { secret: 'xo67Rw' }, (error, payload) => { ... });
  */
 export const decode = (token, optns, cb) => {
   // normalize arguments
@@ -117,7 +121,7 @@ export const decode = (token, optns, cb) => {
   const { secret, ...rest } = options;
 
   // decode and verify
-  verify(token, secret, rest, done);
+  return verify(token, secret, rest, done);
 };
 
 /**
