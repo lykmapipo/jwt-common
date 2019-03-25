@@ -1,7 +1,7 @@
-import _ from 'lodash';
+import { flattenDeep, get, isEmpty, isFunction } from 'lodash';
 import { sign, verify } from 'jsonwebtoken';
 import { parallel, waterfall } from 'async';
-import { compact, uniq } from '@lykmapipo/common';
+import { compact, mergeObjects, uniq } from '@lykmapipo/common';
 import { getString } from '@lykmapipo/env';
 
 /**
@@ -22,8 +22,7 @@ import { getString } from '@lykmapipo/env';
  */
 export const withDefaults = optns => {
   // merge defaults
-  let options = _.merge(
-    {},
+  let options = mergeObjects(
     {
       secret: getString('JWT_SECRET'),
       algorithm: getString('JWT_ALGORITHM', 'HS256'),
@@ -64,11 +63,11 @@ export const withDefaults = optns => {
  */
 export const encode = (payload, optns, cb) => {
   // normalize arguments
-  const options = withDefaults(_.isFunction(optns) ? {} : optns);
-  const done = _.isFunction(optns) ? optns : cb;
+  const options = withDefaults(isFunction(optns) ? {} : optns);
+  const done = isFunction(optns) ? optns : cb;
 
   // throw if empty payload
-  if (_.isEmpty(payload)) {
+  if (isEmpty(payload)) {
     return done(new Error('payload is required'));
   }
 
@@ -103,8 +102,8 @@ export const encode = (payload, optns, cb) => {
  */
 export const decode = (token, optns, cb) => {
   // normalize arguments
-  const options = withDefaults(_.isFunction(optns) ? {} : optns);
-  const done = _.isFunction(optns) ? optns : cb;
+  const options = withDefaults(isFunction(optns) ? {} : optns);
+  const done = isFunction(optns) ? optns : cb;
 
   // prepare jwt decoding options
   const { secret, ...rest } = options;
@@ -164,11 +163,11 @@ export const parseJwtFromHttpHeaders = (request, done) => {
 
   // get authorization header
   const authorization =
-    _.get(request, 'headers.authorization') ||
-    _.get(request, 'headers.Authorization');
+    get(request, 'headers.authorization') ||
+    get(request, 'headers.Authorization');
 
   // parse jwt from header
-  if (!_.isEmpty(authorization)) {
+  if (!isEmpty(authorization)) {
     // split authorization headers
     const parts = authorization.split(' ');
     const [scheme, parsedToken] = parts;
@@ -207,8 +206,8 @@ export const parseJwtFromHttpHeaders = (request, done) => {
  */
 export const parseJwtFromHttpQueryParams = (request, done) => {
   // get jwt from request query params
-  const token = _.get(request, 'query.token');
-  if (!_.isEmpty(token)) {
+  const token = get(request, 'query.token');
+  if (!isEmpty(token)) {
     // delete the token from query params
     delete request.query.token;
   }
@@ -245,7 +244,7 @@ export const parseJwtFromHttpRequest = (request, done) => {
       // collect parsed header
       const { headerToken, urlToken } = results;
       const token = headerToken || urlToken;
-      if (error || _.isEmpty(token)) {
+      if (error || isEmpty(token)) {
         error = error || new Error('Unauthorized'); //eslint-disable-line
         error.status = error.status || 401; //eslint-disable-line
         error.message = error.message || 'Unauthorized'; //eslint-disable-line
@@ -332,9 +331,7 @@ export const jwtPermit = (...requiredScopes) => {
     const jwtScopes = jwt.scope || jwt.scopes || jwt.permissions;
     const userScopes = user.scope || user.scopes || user.permissions;
     let givenScopes = [].concat(userScopes || jwtScopes);
-    givenScopes = uniq(
-      _.flattenDeep(givenScopes.map(scope => scope.split(' ')))
-    );
+    givenScopes = uniq(flattenDeep(givenScopes.map(scope => scope.split(' '))));
 
     // check for required scopes
     const permits = uniq([].concat(...requiredScopes));
