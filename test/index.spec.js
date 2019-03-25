@@ -72,7 +72,7 @@ describe('jwt common', () => {
     encode({}, (error, jwt) => {
       expect(error).to.exist;
       expect(jwt).to.not.exist;
-      expect(error.message).to.be.equal('payload is required');
+      expect(error.message).to.be.equal('Payload Required');
       done();
     });
   });

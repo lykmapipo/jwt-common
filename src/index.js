@@ -9,7 +9,7 @@ import { getString } from '@lykmapipo/env';
  * @name withDefaults
  * @description merge provided options with defaults
  * @param  {Object} [optns] provided options
- * @return {Object} merged options
+ * @return {Object} merged options with environment variables
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -17,25 +17,25 @@ import { getString } from '@lykmapipo/env';
  * @static
  * @public
  * @example
+ *
  * const { withDefaults } = require('@lykmapipo/jwt-common');
  * withDefaults({ secret: 'xo67Rw' }) // => { secret: 'xo67Rw', ...}
  */
 export const withDefaults = optns => {
-  // merge defaults
-  let options = mergeObjects(
-    {
-      secret: getString('JWT_SECRET'),
-      algorithm: getString('JWT_ALGORITHM', 'HS256'),
-      audience: getString('JWT_AUDIENCE'),
-      issuer: getString('JWT_ISSUER'),
-      subject: getString('JWT_SUBJECT'),
-      expiresIn: getString('JWT_EXPIRES_IN'),
-    },
-    optns
-  );
+  // obtain defaults
+  const defaults = {
+    secret: getString('JWT_SECRET'),
+    algorithm: getString('JWT_ALGORITHM', 'HS256'),
+    audience: getString('JWT_AUDIENCE'),
+    issuer: getString('JWT_ISSUER'),
+    subject: getString('JWT_SUBJECT'),
+    expiresIn: getString('JWT_EXPIRES_IN'),
+  };
 
-  // compact and return
-  options = compact(options);
+  // merge provided with defaults
+  const options = compact(mergeObjects(defaults, optns));
+
+  // return merged options
   return options;
 };
 
@@ -54,12 +54,16 @@ export const withDefaults = optns => {
  * @static
  * @public
  * @example
+ *
  * const { encode } = require('@lykmapipo/jwt-common');
  *
- * const secret = process.env.JWT_SECRET || 'xo67Rw';
  * const payload = { _id: 'xo5', permissions: ['user:read'] };
- * encode(payload, (error, jwt) => { ...});
- * encode(payload, { secret }, (error, jwt) => { ...});
+ *
+ * // encode with default options
+ * encode(payload, (error, jwt) => { ... });
+ *
+ * // encode with merged options
+ * encode(payload, { secret: 'xo67Rw' }, (error, jwt) => { ... });
  */
 export const encode = (payload, optns, cb) => {
   // normalize arguments
@@ -68,8 +72,12 @@ export const encode = (payload, optns, cb) => {
 
   // throw if empty payload
   if (isEmpty(payload)) {
-    return done(new Error('payload is required'));
+    const error = new Error('Payload Required');
+    error.status = 400;
+    return done(error);
   }
+
+  // continue with encoding
 
   // prepare jwt sign options
   const { secret, ...rest } = options;
