@@ -80,10 +80,10 @@ export const encode = (payload, optns, cb) => {
   // continue with encoding
 
   // prepare jwt sign options
-  const { secret, ...rest } = options;
+  const { secret, ...jwtSignOptns } = options;
 
   // generate jwt
-  return sign(payload, secret, rest, done);
+  return sign(payload, secret, jwtSignOptns, done);
 };
 
 /**
@@ -118,10 +118,10 @@ export const decode = (token, optns, cb) => {
   const done = isFunction(optns) ? optns : cb;
 
   // prepare jwt decoding options
-  const { secret, ...rest } = options;
+  const { secret, ...jwtVerifyOptns } = options;
 
   // decode and verify
-  return verify(token, secret, rest, done);
+  return verify(token, secret, jwtVerifyOptns, done);
 };
 
 /**
