@@ -1,8 +1,9 @@
 {
   "name": "@lykmapipo/jwt-common",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Helper utilities for day to day jwt usage.",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
   "scripts": {
     "clean": "rimraf lib dist es umd",
     "prebuild": "npm test && npm run clean",

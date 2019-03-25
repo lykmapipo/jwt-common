@@ -1,3 +1,18 @@
+#### 0.3.0 (2019-03-25)
+
+##### Chores
+
+*  force latest dependencies ([2af29004](https://github.com/lykmapipo/jwt-common/commit/2af29004cc226c8c94681b00f486f1c9407b0e41))
+
+##### Refactors
+
+*  ensure returns ([40b92cdd](https://github.com/lykmapipo/jwt-common/commit/40b92cddfa5bb9a141276132f21a35942a29ee13))
+*  give resonable name on jwt sign & verify options ([3624ae89](https://github.com/lykmapipo/jwt-common/commit/3624ae895572f86884eadfa1fc7a75f741244927))
+*  ensure return on decoding ([b9210476](https://github.com/lykmapipo/jwt-common/commit/b9210476f13097010692fe09eb8dfa41dadb05f6))
+*  ensure error code on encoding empty jwt payload ([d88bc8cf](https://github.com/lykmapipo/jwt-common/commit/d88bc8cf356f6e87d719814c8be8357b8a9bed90))
+*  use specific lodash dependencies ([d3fd259a](https://github.com/lykmapipo/jwt-common/commit/d3fd259a363a244d4a03f27909d6e9583f6868fa))
+*  migrate to use eslint, prettier & isomorphic packing ([a0609e08](https://github.com/lykmapipo/jwt-common/commit/a0609e08a5639e1802b8cf0c858ad193d45d2586))
+
 #### 0.2.1 (2019-02-25)
 
 ##### Bug Fixes

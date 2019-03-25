@@ -1,4 +1,4 @@
-import { flattenDeep, get, isEmpty, isFunction } from 'lodash';
+import { isFunction, isEmpty, get, flattenDeep } from 'lodash';
 import { sign, verify } from 'jsonwebtoken';
 import { parallel, waterfall } from 'async';
 import { compact, mergeObjects, uniq } from '@lykmapipo/common';
@@ -21,7 +21,7 @@ import { getString } from '@lykmapipo/env';
  * const { withDefaults } = require('@lykmapipo/jwt-common');
  * withDefaults({ secret: 'xo67Rw' }) // => { secret: 'xo67Rw', ...}
  */
-export const withDefaults = optns => {
+const withDefaults = optns => {
   // obtain defaults
   const defaults = {
     secret: getString('JWT_SECRET'),
@@ -65,7 +65,7 @@ export const withDefaults = optns => {
  * // encode with merged options
  * encode(payload, { secret: 'xo67Rw' }, (error, jwt) => { ... });
  */
-export const encode = (payload, optns, cb) => {
+const encode = (payload, optns, cb) => {
   // normalize arguments
   const options = withDefaults(isFunction(optns) ? {} : optns);
   const done = isFunction(optns) ? optns : cb;
@@ -112,7 +112,7 @@ export const encode = (payload, optns, cb) => {
  * // decode with provided options
  * decode(token, { secret: 'xo67Rw' }, (error, payload) => { ... });
  */
-export const decode = (token, optns, cb) => {
+const decode = (token, optns, cb) => {
   // normalize arguments
   const options = withDefaults(isFunction(optns) ? {} : optns);
   const done = isFunction(optns) ? optns : cb;
@@ -137,7 +137,7 @@ export const decode = (token, optns, cb) => {
  * @version 0.1.0
  * @private
  */
-export const decodeJwtToUser = optns => {
+const decodeJwtToUser = optns => {
   // normalize arguments
   const options = withDefaults(optns);
 
@@ -171,7 +171,7 @@ export const decodeJwtToUser = optns => {
  * const { parseJwtFromHttpHeaders } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpHeaders(request, (error, jwt) => { ... });
  */
-export const parseJwtFromHttpHeaders = (request, done) => {
+const parseJwtFromHttpHeaders = (request, done) => {
   let token;
 
   // get authorization header
@@ -218,7 +218,7 @@ export const parseJwtFromHttpHeaders = (request, done) => {
  * const { parseJwtFromHttpQueryParams } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpQueryParams(request, (error, jwt) => { ... });
  */
-export const parseJwtFromHttpQueryParams = (request, done) => {
+const parseJwtFromHttpQueryParams = (request, done) => {
   // get jwt from request query params
   const token = get(request, 'query.token');
   if (!isEmpty(token)) {
@@ -248,7 +248,7 @@ export const parseJwtFromHttpQueryParams = (request, done) => {
  * const { parseJwtFromHttpRequest } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpRequest(request, (error, jwt) => { ... });
  */
-export const parseJwtFromHttpRequest = (request, done) => {
+const parseJwtFromHttpRequest = (request, done) => {
   // parse for jwt from request headers and query params
   parallel(
     {
@@ -288,7 +288,7 @@ export const parseJwtFromHttpRequest = (request, done) => {
  *
  * app.get('/users', jwtAuth({ secret: 'xo67Rw' }), (req, res, next) => { ... });
  */
-export const jwtAuth = optns => {
+const jwtAuth = optns => {
   // implement jwt authorize middleware
   const jwtAuthorize = (request, response, next) => {
     // parse jwt from request
@@ -338,7 +338,7 @@ export const jwtAuth = optns => {
  *
  * app.get('/users', jwtPermit('user:read'), (req, res, next) => { ... });
  */
-export const jwtPermit = (...requiredScopes) => {
+const jwtPermit = (...requiredScopes) => {
   // implement jwt permit
   const checkJwtPermit = (request, response, next) => {
     // obtain user and jwt from request
@@ -368,3 +368,5 @@ export const jwtPermit = (...requiredScopes) => {
   // return
   return checkJwtPermit;
 };
+
+export { decode, decodeJwtToUser, encode, jwtAuth, jwtPermit, parseJwtFromHttpHeaders, parseJwtFromHttpQueryParams, parseJwtFromHttpRequest, withDefaults };
