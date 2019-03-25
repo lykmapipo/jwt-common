@@ -167,6 +167,7 @@ export const decodeJwtToUser = optns => {
  * @static
  * @public
  * @example
+ *
  * const { parseJwtFromHttpHeaders } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpHeaders(request, (error, jwt) => { ... });
  */
@@ -196,7 +197,7 @@ export const parseJwtFromHttpHeaders = (request, done) => {
   }
 
   // return found token
-  done(null, token);
+  return done(null, token);
 };
 
 /**
@@ -213,6 +214,7 @@ export const parseJwtFromHttpHeaders = (request, done) => {
  * @static
  * @public
  * @example
+ *
  * const { parseJwtFromHttpQueryParams } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpQueryParams(request, (error, jwt) => { ... });
  */
@@ -225,7 +227,7 @@ export const parseJwtFromHttpQueryParams = (request, done) => {
   }
 
   // return found token
-  done(null, token);
+  return done(null, token);
 };
 
 /**
@@ -242,6 +244,7 @@ export const parseJwtFromHttpQueryParams = (request, done) => {
  * @static
  * @public
  * @example
+ *
  * const { parseJwtFromHttpRequest } = require('@lykmapipo/jwt-common');
  * parseJwtFromHttpRequest(request, (error, jwt) => { ... });
  */
@@ -260,10 +263,9 @@ export const parseJwtFromHttpRequest = (request, done) => {
         error = error || new Error('Unauthorized'); //eslint-disable-line
         error.status = error.status || 401; //eslint-disable-line
         error.message = error.message || 'Unauthorized'; //eslint-disable-line
-        done(error);
-      } else {
-        done(null, token);
+        return done(error);
       }
+      return done(null, token);
     }
   );
 };
@@ -280,9 +282,10 @@ export const parseJwtFromHttpRequest = (request, done) => {
  * @static
  * @public
  * @example
+ *
  * const { jwtAuth } = require('@lykmapipo/jwt-common');
- * const secret = process.env.JWT_SECRET || 'xo67Rw';
- * app.get('/users', jwtAuth({ secret }), (req, res, next) => { ... });
+ *
+ * app.get('/users', jwtAuth({ secret: 'xo67Rw' }), (req, res, next) => { ... });
  */
 export const jwtAuth = optns => {
   // implement jwt authorize middleware
@@ -301,14 +304,13 @@ export const jwtAuth = optns => {
         if (error) {
           error.status = error.status || 401; //eslint-disable-line
           error.message = error.message || 'Unauthorized'; //eslint-disable-line
-          next(error);
+          return next(error);
         }
         // set jwt and continue
-        else {
-          request.jwt = token;
-          request.user = user;
-          next();
-        }
+
+        request.jwt = token;
+        request.user = user;
+        return next();
       }
     );
   };
@@ -329,6 +331,7 @@ export const jwtAuth = optns => {
  * @static
  * @public
  * @example
+ *
  * const { jwtPermit } = require('@lykmapipo/jwt-common');
  *
  * app.get('/users', jwtPermit('user:read'), (req, res, next) => { ... });
@@ -351,14 +354,13 @@ export const jwtPermit = (...requiredScopes) => {
 
     // has scopes
     if (allowed) {
-      next();
+      return next();
     }
     // has no scopes
-    else {
-      const error = new Error('Forbidden');
-      error.status = 403;
-      next(error);
-    }
+
+    const error = new Error('Forbidden');
+    error.status = 403;
+    return next(error);
   };
 
   // return
