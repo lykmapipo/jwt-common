@@ -1,3 +1,9 @@
+#### 0.3.1 (2019-04-12)
+
+##### Chores
+
+*  force latest dependencies ([2e5be85d](https://github.com/lykmapipo/jwt-common/commit/2e5be85d31bf74114195e5729da4534b687bf845))
+
 #### 0.3.0 (2019-03-25)
 
 ##### Chores
