@@ -1,3 +1,9 @@
+#### 0.3.3 (2019-05-01)
+
+##### Documentation Changes
+
+* **readme:**  remove WIP ([54811570](https://github.com/lykmapipo/jwt-common/commit/54811570e8989574e26f95391136f44b23996945))
+
 #### 0.3.2 (2019-05-01)
 
 ##### Chores
