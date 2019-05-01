@@ -1,4 +1,4 @@
-# jwt-common(WIP)
+# jwt-common
 
 [![Build module-starter](https://travis-ci.org/lykmapipo/jwt-common.svg?branch=master)](https://travis-ci.org/lykmapipo/jwt-common)
 [![Dependencies module-starter](https://david-dm.org/lykmapipo/jwt-common.svg?style=flat-square)](https://david-dm.org/lykmapipo/jwt-common)
