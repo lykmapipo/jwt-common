@@ -1,3 +1,13 @@
+#### 0.3.2 (2019-05-01)
+
+##### Chores
+
+* **ci:**
+  *  configure commit lint script & force latest nodejs ([6a6d82ad](https://github.com/lykmapipo/jwt-common/commit/6a6d82ad9008078fd005cda8adf8d6f06b16bf18))
+  *  configure commit lint script & force latest nodejs ([aa0785ed](https://github.com/lykmapipo/jwt-common/commit/aa0785eda82b63e92d1db833015b406674ea8bba))
+* **.npmrc:**  prevent npm version to commit and tag version ([aa8a7191](https://github.com/lykmapipo/jwt-common/commit/aa8a71911e5af13e94ee3081a432ee9e0e51bb94))
+* **deps:**  force latest version & audit fix ([040d7211](https://github.com/lykmapipo/jwt-common/commit/040d72115a50a248c7b834f8906b634cfcc0d906))
+
 #### 0.3.1 (2019-04-12)
 
 ##### Chores
