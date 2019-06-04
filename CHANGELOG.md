@@ -1,3 +1,9 @@
+#### 0.3.6 (2019-06-04)
+
+##### Chores
+
+* **deps:**  force latest version & audit fix ([fd1ee6fb](https://github.com/lykmapipo/jwt-common/commit/fd1ee6fb2e81b98c4ad25ac4539915317c412504))
+
 #### 0.3.5 (2019-05-20)
 
 ##### Chores
