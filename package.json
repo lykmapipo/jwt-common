@@ -73,12 +73,12 @@
     "eslint-plugin-prettier": "^3.1.0",
     "generate-changelog": "^1.8.0",
     "handlebars": "^4.1.2",
-    "husky": "^2.4.1",
+    "husky": "^2.7.0",
     "lint-staged": "^8.2.1",
     "mocha": "^6.1.4",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
-    "rollup": "^1.16.2"
+    "rollup": "^1.16.3"
   },
   "dependencies": {
     "@lykmapipo/common": ">=0.22.2",
