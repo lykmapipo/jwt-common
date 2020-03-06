@@ -54,9 +54,9 @@
   "homepage": "https://github.com/lykmapipo/jwt-common",
   "devDependencies": {
     "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.6",
-    "@babel/node": "^7.8.4",
-    "@babel/preset-env": "^7.8.6",
+    "@babel/core": "^7.8.7",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "@babel/register": "^7.8.6",
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
@@ -79,12 +79,12 @@
     "mocha": "^7.1.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",
-    "rollup": "^1.32.0",
+    "rollup": "^1.32.1",
     "shelljs": "^0.8.3"
   },
   "dependencies": {
-    "@lykmapipo/common": ">=0.30.6",
-    "@lykmapipo/env": ">=0.16.8",
+    "@lykmapipo/common": ">=0.30.7",
+    "@lykmapipo/env": ">=0.16.9",
     "async": ">=3.2.0",
     "jsonwebtoken": ">=8.5.1",
     "lodash": ">=4.17.15"
