@@ -21,7 +21,7 @@ import { getString } from '@lykmapipo/env';
  * const { withDefaults } = require('@lykmapipo/jwt-common');
  * withDefaults({ secret: 'xo67Rw' }) // => { secret: 'xo67Rw', ...}
  */
-export const withDefaults = optns => {
+export const withDefaults = (optns) => {
   // obtain defaults
   const defaults = {
     secret: getString('JWT_SECRET'),
@@ -137,7 +137,7 @@ export const decode = (token, optns, cb) => {
  * @version 0.1.0
  * @private
  */
-export const decodeJwtToUser = optns => {
+export const decodeJwtToUser = (optns) => {
   // normalize arguments
   const options = withDefaults(optns);
 
@@ -252,8 +252,8 @@ export const parseJwtFromHttpRequest = (request, done) => {
   // parse for jwt from request headers and query params
   parallel(
     {
-      headerToken: next => parseJwtFromHttpHeaders(request, next),
-      urlToken: next => parseJwtFromHttpQueryParams(request, next),
+      headerToken: (next) => parseJwtFromHttpHeaders(request, next),
+      urlToken: (next) => parseJwtFromHttpQueryParams(request, next),
     },
     (error, results = {}) => {
       // collect parsed header
@@ -288,11 +288,11 @@ export const parseJwtFromHttpRequest = (request, done) => {
  *
  * app.get('/users', jwtAuth({ secret: 'xo67Rw' }), (req, res, next) => { ... });
  */
-export const jwtAuth = optns => {
+export const jwtAuth = (optns) => {
   // implement jwt authorize middleware
   const jwtAuthorize = (request, response, next) => {
     // parse jwt from request
-    const parseJwt = cb => parseJwtFromHttpRequest(request, cb);
+    const parseJwt = (cb) => parseJwtFromHttpRequest(request, cb);
 
     // decode jwt from request
     const decodeJwt = (token, cb) => decode(token, optns, cb);
@@ -348,11 +348,13 @@ export const jwtPermit = (...requiredScopes) => {
     const jwtScopes = jwt.scope || jwt.scopes || jwt.permissions;
     const userScopes = user.scope || user.scopes || user.permissions;
     let givenScopes = [].concat(userScopes || jwtScopes);
-    givenScopes = uniq(flattenDeep(givenScopes.map(scope => scope.split(' '))));
+    givenScopes = uniq(
+      flattenDeep(givenScopes.map((scope) => scope.split(' ')))
+    );
 
     // check for required scopes
     const permits = uniq([].concat(...requiredScopes));
-    const allowed = permits.some(scope => givenScopes.includes(scope));
+    const allowed = permits.some((scope) => givenScopes.includes(scope));
 
     // has scopes
     if (allowed) {

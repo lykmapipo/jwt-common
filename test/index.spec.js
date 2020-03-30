@@ -34,7 +34,7 @@ describe('jwt common', () => {
     expect(options.expiresIn).to.be.equal('7y');
   });
 
-  it('should encode given payload', done => {
+  it('should encode given payload', (done) => {
     expect(encode).to.exist;
     expect(encode).to.be.a('function');
     expect(encode.name).to.be.equal('encode');
@@ -48,7 +48,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should encode given payload with provide options', done => {
+  it('should encode given payload with provide options', (done) => {
     expect(encode).to.exist;
     expect(encode).to.be.a('function');
     expect(encode.name).to.be.equal('encode');
@@ -63,7 +63,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should throw if encode empty payload', done => {
+  it('should throw if encode empty payload', (done) => {
     expect(encode).to.exist;
     expect(encode).to.be.a('function');
     expect(encode.name).to.be.equal('encode');
@@ -77,7 +77,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should decode given payload', done => {
+  it('should decode given payload', (done) => {
     expect(decode).to.exist;
     expect(decode).to.be.a('function');
     expect(decode.name).to.be.equal('decode');
@@ -85,7 +85,7 @@ describe('jwt common', () => {
 
     const payload = { _id: 'xo5', permissions: ['user:read'] };
     waterfall(
-      [next => encode(payload, next), (jwt, next) => decode(jwt, next)],
+      [(next) => encode(payload, next), (jwt, next) => decode(jwt, next)],
       (error, decoded) => {
         expect(error).to.not.exist;
         expect(decoded).to.exist;
@@ -101,7 +101,7 @@ describe('jwt common', () => {
     );
   });
 
-  it('should decode given payload with provided options', done => {
+  it('should decode given payload with provided options', (done) => {
     expect(decode).to.exist;
     expect(decode).to.be.a('function');
     expect(decode.name).to.be.equal('decode');
@@ -111,7 +111,7 @@ describe('jwt common', () => {
     const options = { secret: 'xo67', subject: 'sub', audience: 'aud' };
     waterfall(
       [
-        next => encode(payload, options, next),
+        (next) => encode(payload, options, next),
         (jwt, next) => decode(jwt, options, next),
       ],
       (error, decoded) => {
@@ -129,7 +129,7 @@ describe('jwt common', () => {
     );
   });
 
-  it('should parse jwt from http headers', done => {
+  it('should parse jwt from http headers', (done) => {
     expect(parseJwtFromHttpHeaders).to.exist;
     expect(parseJwtFromHttpHeaders).to.be.a('function');
     expect(parseJwtFromHttpHeaders.name).to.be.equal('parseJwtFromHttpHeaders');
@@ -148,7 +148,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should parse jwt from http headers', done => {
+  it('should parse jwt from http headers', (done) => {
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
 
@@ -162,7 +162,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should parse jwt from http query params', done => {
+  it('should parse jwt from http query params', (done) => {
     expect(parseJwtFromHttpQueryParams).to.exist;
     expect(parseJwtFromHttpQueryParams).to.be.a('function');
     expect(parseJwtFromHttpQueryParams.name).to.be.equal(
@@ -183,7 +183,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should parse jwt from http request', done => {
+  it('should parse jwt from http request', (done) => {
     expect(parseJwtFromHttpRequest).to.exist;
     expect(parseJwtFromHttpRequest).to.be.a('function');
     expect(parseJwtFromHttpRequest.name).to.be.equal('parseJwtFromHttpRequest');
@@ -202,7 +202,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should parse jwt from http request', done => {
+  it('should parse jwt from http request', (done) => {
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
 
@@ -216,7 +216,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should parse jwt from http request', done => {
+  it('should parse jwt from http request', (done) => {
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM0MzY0LCJleHAiOjE3Njg0Mzc1NjQsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.k5efjPoUWuZMHtonYzNsbfPxWjZTBKUxjh5QzREtiYw';
 
@@ -230,7 +230,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should authorize http request', done => {
+  it('should authorize http request', (done) => {
     expect(jwtAuth).to.exist;
     expect(jwtAuth).to.be.a('function');
     expect(jwtAuth.name).to.be.equal('jwtAuth');
@@ -242,7 +242,7 @@ describe('jwt common', () => {
     const request = { headers: { authorization: `Bearer ${jwt}` } };
     const response = {};
 
-    jwtAuth()(request, response, error => {
+    jwtAuth()(request, response, (error) => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       expect(request.jwt._id).to.be.equal(payload._id);
@@ -251,7 +251,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should authorize http request with options', done => {
+  it('should authorize http request with options', (done) => {
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM3NTkyLCJleHAiOjE3Njg0NDA3OTIsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.0dHIXyBV1385t72eZ4GZ_wXaGV2SPh2lfUkw81bCQb4';
 
@@ -260,7 +260,7 @@ describe('jwt common', () => {
     const request = { headers: { authorization: `Bearer ${jwt}` } };
     const response = {};
 
-    jwtAuth(options)(request, response, error => {
+    jwtAuth(options)(request, response, (error) => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       expect(request.jwt._id).to.be.equal(payload._id);
@@ -269,7 +269,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should authorize http request and decode jwt to user', done => {
+  it('should authorize http request and decode jwt to user', (done) => {
     const jwt =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJ4bzUiLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiXSwiaWF0IjoxNTQ3NTM3NTkyLCJleHAiOjE3Njg0NDA3OTIsImF1ZCI6ImF1ZGllbmNlIiwiaXNzIjoiaXNzdWVyIiwic3ViIjoic3ViamVjdCJ9.0dHIXyBV1385t72eZ4GZ_wXaGV2SPh2lfUkw81bCQb4';
 
@@ -279,7 +279,7 @@ describe('jwt common', () => {
     const request = { headers: { authorization: `Bearer ${jwt}` } };
     const response = {};
 
-    jwtAuth(options)(request, response, error => {
+    jwtAuth(options)(request, response, (error) => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       expect(request.jwt._id).to.be.equal(payload._id);
@@ -290,11 +290,11 @@ describe('jwt common', () => {
     });
   });
 
-  it('should throw unauthorized if token missing', done => {
+  it('should throw unauthorized if token missing', (done) => {
     const request = {};
     const response = {};
 
-    jwtAuth()(request, response, error => {
+    jwtAuth()(request, response, (error) => {
       expect(error).to.exist;
       expect(error.message).to.be.equal('Unauthorized');
       expect(error.status).to.be.equal(401);
@@ -302,7 +302,7 @@ describe('jwt common', () => {
     });
   });
 
-  it('should permit http request with required scopes', done => {
+  it('should permit http request with required scopes', (done) => {
     expect(jwtPermit).to.exist;
     expect(jwtPermit).to.be.a('function');
     expect(jwtPermit.name).to.be.equal('jwtPermit');
@@ -311,19 +311,19 @@ describe('jwt common', () => {
     const request = { jwt: payload };
     const response = {};
 
-    jwtPermit('user:read')(request, response, error => {
+    jwtPermit('user:read')(request, response, (error) => {
       expect(error).to.not.exist;
       expect(request.jwt).to.exist;
       done();
     });
   });
 
-  it('should throw insufficient scopes if miss required scopes', done => {
+  it('should throw insufficient scopes if miss required scopes', (done) => {
     const payload = { _id: 'xo5', permissions: ['user:read'] };
     const request = { jwt: payload };
     const response = {};
 
-    jwtPermit('user:create')(request, response, error => {
+    jwtPermit('user:create')(request, response, (error) => {
       expect(error).to.exist;
       expect(error.message).to.be.equal('Forbidden');
       expect(error.status).to.be.equal(403);
