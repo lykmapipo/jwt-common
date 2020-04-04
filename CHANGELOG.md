@@ -1,3 +1,24 @@
+#### 0.4.0 (2020-04-04)
+
+##### Chores
+
+*  setup code coverage ([d385af70](https://github.com/lykmapipo/jwt-common/commit/d385af70f10ecd4a86eb61b00aec268db533bffd))
+* **deps:**  force latest version & audit fix ([27b575cd](https://github.com/lykmapipo/jwt-common/commit/27b575cdcc159595e8d9b9cb5c019bb1ca965da2))
+
+##### Documentation Changes
+
+*  add isExpired usage docs ([dde350e6](https://github.com/lykmapipo/jwt-common/commit/dde350e601ff4ed0f073b0a67926ec2b1cbf5daa))
+*  add refresh usage ([bbd7d0a7](https://github.com/lykmapipo/jwt-common/commit/bbd7d0a7ae72e7d10686ee0ec9df32bc46ec2ea6))
+
+##### New Features
+
+*  allow check for expiry ([d8018b6c](https://github.com/lykmapipo/jwt-common/commit/d8018b6c93661b3e78636eb0a5e9add38ded5fec))
+*  add refresh shortcut ([1f64e0b2](https://github.com/lykmapipo/jwt-common/commit/1f64e0b23e1e3643106770547b39fa7dfee5a936))
+
+##### Tests
+
+*  check for token expiry on decode ([416de717](https://github.com/lykmapipo/jwt-common/commit/416de717114c5d93a2ce5dab18546de5f521dce8))
+
 #### 0.3.29 (2020-03-30)
 
 ##### Chores

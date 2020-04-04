@@ -1,6 +1,6 @@
 import { isFunction, isEmpty, get, flattenDeep } from 'lodash';
-import { sign, verify } from 'jsonwebtoken';
-import { parallel, waterfall } from 'async';
+import { sign, verify, decode as decode$1 } from 'jsonwebtoken';
+import { waterfall, parallel } from 'async';
 import { compact, mergeObjects, uniq } from '@lykmapipo/common';
 import { getString } from '@lykmapipo/env';
 
@@ -21,7 +21,7 @@ import { getString } from '@lykmapipo/env';
  * const { withDefaults } = require('@lykmapipo/jwt-common');
  * withDefaults({ secret: 'xo67Rw' }) // => { secret: 'xo67Rw', ...}
  */
-const withDefaults = optns => {
+const withDefaults = (optns) => {
   // obtain defaults
   const defaults = {
     secret: getString('JWT_SECRET'),
@@ -104,7 +104,7 @@ const encode = (payload, optns, cb) => {
  *
  * const { decode } = require('@lykmapipo/jwt-common');
  *
- * const payload = { _id: 'xo5', permissions: ['user:read'] };
+ * const token = 'eyJhbGciOiJIUz...';
  *
  * // decode with default options
  * decode(token, (error, payload) => { ... });
@@ -125,6 +125,114 @@ const decode = (token, optns, cb) => {
 };
 
 /**
+ * @function refresh
+ * @name refresh
+ * @description decode a given jwt, if expired return new jwt.
+ * @param {String} token jwt token to refresh.
+ * @param {Object} payload data to encode.
+ * @param {Object} [opts] jwt verify or decoding options.
+ * @param {Function} cb callback to invoke on success or failure.
+ * @return {String|Error} jwt token if success or error.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.4.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ *
+ * const { refresh } = require('@lykmapipo/jwt-common');
+ *
+ * const token = 'eyJhbGciOiJIUz...';
+ * const payload = { _id: 'xo5', permissions: ['user:read'] };
+ *
+ * // refresh with default options
+ * refresh(token, payload, (error, jwt) => { ... });
+ *
+ * // refresh with provided options
+ * refresh(token, payload, { secret: 'xo67Rw' }, (error, jwt) => { ... });
+ */
+const refresh = (token, payload, optns, cb) => {
+  // normalize arguments
+  const options = withDefaults(isFunction(optns) ? {} : optns);
+  const done = isFunction(optns) ? optns : cb;
+
+  // try decode token
+  const doDecode = (next) => {
+    // decode jwt
+    return decode(token, options, (error, decoded) => {
+      // ignore if expired(or jwt errors)
+      return next(null, decoded || {});
+    });
+  };
+
+  // try return fresh token
+  const doEncode = (decoded, next) => {
+    // return token if still valid
+    if (!isEmpty(decoded)) {
+      return next(null, token);
+    }
+
+    // create fresh jwt
+    return encode(payload, options, next);
+  };
+
+  // prepare refresh tasks
+  const tasks = [doDecode, doEncode];
+
+  // do refresh
+  return waterfall(tasks, done);
+};
+
+/**
+ * @function isExpired
+ * @name isExpired
+ * @description check if jwt expired without verifying if
+ * the signature is valid.
+ * @param {String} token jwt token to check for expiry.
+ * @param {Object} [opts] jwt verify or decoding options.
+ * @param {Function} [cb] callback to invoke on success or failure.
+ * @return {Boolean} whether jwt expired.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.4.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ *
+ * const { isExpired } = require('@lykmapipo/jwt-common');
+ *
+ * const token = 'eyJhbGciOiJIUz...';
+ *
+ * // isExpired with default options
+ * isExpired(token); //=> false
+ *
+ * // isExpired with provided options
+ * const optns = { clockTimestamp : Math.floor(Date.now() / 1000) }
+ * isExpired(token, optns); //=> true
+ */
+const isExpired = (token, optns) => {
+  // normalize arguments
+  const options = withDefaults(optns);
+
+  // obtain clock timestamp
+  const clockTimestamp =
+    options.clockTimestamp || Math.floor(Date.now() / 1000);
+
+  // decode jwt
+  const { payload } = decode$1(token, { complete: true }) || {};
+
+  // check for expiry
+  if (payload && payload.exp) {
+    return clockTimestamp >= payload.exp;
+  }
+
+  // always true if error
+  return true;
+};
+
+/**
  * @function decodeJwtToUser
  * @name decodeJwtToUser
  * @description return a function used to decode jwt to user.
@@ -137,7 +245,7 @@ const decode = (token, optns, cb) => {
  * @version 0.1.0
  * @private
  */
-const decodeJwtToUser = optns => {
+const decodeJwtToUser = (optns) => {
   // normalize arguments
   const options = withDefaults(optns);
 
@@ -252,8 +360,8 @@ const parseJwtFromHttpRequest = (request, done) => {
   // parse for jwt from request headers and query params
   parallel(
     {
-      headerToken: next => parseJwtFromHttpHeaders(request, next),
-      urlToken: next => parseJwtFromHttpQueryParams(request, next),
+      headerToken: (next) => parseJwtFromHttpHeaders(request, next),
+      urlToken: (next) => parseJwtFromHttpQueryParams(request, next),
     },
     (error, results = {}) => {
       // collect parsed header
@@ -288,11 +396,11 @@ const parseJwtFromHttpRequest = (request, done) => {
  *
  * app.get('/users', jwtAuth({ secret: 'xo67Rw' }), (req, res, next) => { ... });
  */
-const jwtAuth = optns => {
+const jwtAuth = (optns) => {
   // implement jwt authorize middleware
   const jwtAuthorize = (request, response, next) => {
     // parse jwt from request
-    const parseJwt = cb => parseJwtFromHttpRequest(request, cb);
+    const parseJwt = (cb) => parseJwtFromHttpRequest(request, cb);
 
     // decode jwt from request
     const decodeJwt = (token, cb) => decode(token, optns, cb);
@@ -348,11 +456,13 @@ const jwtPermit = (...requiredScopes) => {
     const jwtScopes = jwt.scope || jwt.scopes || jwt.permissions;
     const userScopes = user.scope || user.scopes || user.permissions;
     let givenScopes = [].concat(userScopes || jwtScopes);
-    givenScopes = uniq(flattenDeep(givenScopes.map(scope => scope.split(' '))));
+    givenScopes = uniq(
+      flattenDeep(givenScopes.map((scope) => scope.split(' ')))
+    );
 
     // check for required scopes
     const permits = uniq([].concat(...requiredScopes));
-    const allowed = permits.some(scope => givenScopes.includes(scope));
+    const allowed = permits.some((scope) => givenScopes.includes(scope));
 
     // has scopes
     if (allowed) {
@@ -369,4 +479,4 @@ const jwtPermit = (...requiredScopes) => {
   return checkJwtPermit;
 };
 
-export { decode, decodeJwtToUser, encode, jwtAuth, jwtPermit, parseJwtFromHttpHeaders, parseJwtFromHttpQueryParams, parseJwtFromHttpRequest, withDefaults };
+export { decode, decodeJwtToUser, encode, isExpired, jwtAuth, jwtPermit, parseJwtFromHttpHeaders, parseJwtFromHttpQueryParams, parseJwtFromHttpRequest, refresh, withDefaults };
