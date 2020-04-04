@@ -7,6 +7,7 @@ import {
   encode,
   decode,
   refresh,
+  isExpired,
   parseJwtFromHttpHeaders,
   parseJwtFromHttpQueryParams,
   parseJwtFromHttpRequest,
@@ -206,6 +207,46 @@ describe('jwt common', () => {
         done(error, freshJwt);
       }
     );
+  });
+
+  it('should return expired = true if token not jwt', () => {
+    expect(isExpired(undefined)).to.be.true;
+    expect(isExpired(null)).to.be.true;
+    expect(isExpired('')).to.be.true;
+    expect(isExpired(' ')).to.be.true;
+    expect(isExpired(() => {})).to.be.true;
+  });
+
+  it('should return true if token expired', (done) => {
+    expect(isExpired).to.exist;
+    expect(isExpired).to.be.a('function');
+    expect(isExpired.name).to.be.equal('isExpired');
+    expect(isExpired.length).to.be.equal(2);
+
+    const payload = {
+      _id: 'xo5',
+      permissions: ['user:read'],
+      iat: NOW_SECONDS - 8 * YEAR_SECONDS, // issued 8 years ago
+    };
+    encode(payload, (error, jwt) => {
+      expect(error).to.not.exist;
+      expect(jwt).to.exist;
+      expect(isExpired(jwt)).to.be.true;
+      done(error, jwt);
+    });
+  });
+
+  it('should return false if token not expired', (done) => {
+    const payload = {
+      _id: 'xo5',
+      permissions: ['user:read'],
+    };
+    encode(payload, (error, jwt) => {
+      expect(error).to.not.exist;
+      expect(jwt).to.exist;
+      expect(isExpired(jwt)).to.be.false;
+      done(error, jwt);
+    });
   });
 
   it('should parse jwt from http headers', (done) => {

@@ -1,5 +1,5 @@
 import { flattenDeep, get, isEmpty, isFunction } from 'lodash';
-import { sign, verify } from 'jsonwebtoken';
+import { sign, verify, decode as jwtDecode } from 'jsonwebtoken';
 import { parallel, waterfall } from 'async';
 import { compact, mergeObjects, uniq } from '@lykmapipo/common';
 import { getString } from '@lykmapipo/env';
@@ -182,6 +182,54 @@ export const refresh = (token, payload, optns, cb) => {
 
   // do refresh
   return waterfall(tasks, done);
+};
+
+/**
+ * @function isExpired
+ * @name isExpired
+ * @description check if jwt expired without verifying if
+ * the signature is valid.
+ * @param {String} token jwt token to check for expiry.
+ * @param {Object} [opts] jwt verify or decoding options.
+ * @param {Function} [cb] callback to invoke on success or failure.
+ * @return {Boolean} whether jwt expired.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.4.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ *
+ * const { isExpired } = require('@lykmapipo/jwt-common');
+ *
+ * const token = 'eyJhbGciOiJIUz...';
+ *
+ * // isExpired with default options
+ * isExpired(token); //=> false
+ *
+ * // isExpired with provided options
+ * const optns = { clockTimestamp : Math.floor(Date.now() / 1000) }
+ * isExpired(token, optns); //=> true
+ */
+export const isExpired = (token, optns) => {
+  // normalize arguments
+  const options = withDefaults(optns);
+
+  // obtain clock timestamp
+  const clockTimestamp =
+    options.clockTimestamp || Math.floor(Date.now() / 1000);
+
+  // decode jwt
+  const { payload } = jwtDecode(token, { complete: true }) || {};
+
+  // check for expiry
+  if (payload && payload.exp) {
+    return clockTimestamp >= payload.exp;
+  }
+
+  // always true if error
+  return true;
 };
 
 /**
