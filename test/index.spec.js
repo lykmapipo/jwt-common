@@ -1,5 +1,6 @@
 import { waterfall } from 'async';
 import { expect } from 'chai';
+import { TokenExpiredError } from 'jsonwebtoken';
 import {
   withDefaults,
   encode,
@@ -10,6 +11,9 @@ import {
   jwtAuth,
   jwtPermit,
 } from '../src/index';
+
+const NOW_SECONDS = Math.floor(Date.now() / 1000);
+const YEAR_SECONDS = 365 * 24 * 60 * 60;
 
 describe('jwt common', () => {
   process.env.NODE_ENV = 'test';
@@ -125,6 +129,27 @@ describe('jwt common', () => {
         expect(decoded.iss).to.be.equal('issuer');
         expect(decoded.sub).to.be.equal('sub');
         done(error, decoded);
+      }
+    );
+  });
+
+  it('should decode and throw if token expired', (done) => {
+    const payload = {
+      _id: 'xo5',
+      permissions: ['user:read'],
+      iat: NOW_SECONDS - 8 * YEAR_SECONDS, // issued 8 years ago
+    };
+
+    waterfall(
+      [(next) => encode(payload, next), (jwt, next) => decode(jwt, next)],
+      (error, decoded) => {
+        expect(error).to.exist;
+        expect(error).to.be.an.instanceof(TokenExpiredError);
+        expect(error.name).to.equal('TokenExpiredError');
+        expect(error.message).to.equal('jwt expired');
+        expect(error.expiredAt).to.exist;
+        expect(decoded).to.not.exist;
+        done();
       }
     );
   });
