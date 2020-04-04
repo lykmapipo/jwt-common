@@ -21,12 +21,13 @@ npm install --save @lykmapipo/jwt-common
 ## Usage
 
 ```js
-const { encode, decode, refresh } = require('@lykmapipo/jwt-common');
+const { encode, decode, refresh, isExpired } = require('@lykmapipo/jwt-common');
 
 // plain
 encode(payload, (error, jwt) => { ... });
 decode(token, (error, jwt) => { ... });
 refresh(token, payload, (error, jwt) => { ... });
+isExpired(token); //=> false
 
 // express
 const { jwtAuth, jwtPermit } = require('@lykmapipo/jwt-common');
