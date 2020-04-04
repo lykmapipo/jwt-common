@@ -1,3 +1,11 @@
+# [@lykmapipo/jwt-common](https://github.com/lykmapipo/jwt-common) *0.4.1*
+
+> Helper utilities for day to day jwt usage.
+
+
+### lib/index.js
+
+
 #### withDefaults([optns]) 
 
 merge provided options with defaults
@@ -95,7 +103,7 @@ decode and verify given jwt.
 
 const { decode } = require('@lykmapipo/jwt-common');
 
-const payload = { _id: 'xo5', permissions: ['user:read'] };
+const token = 'eyJhbGciOiJIUz...';
 
 // decode with default options
 decode(token, (error, payload) => { ... });
@@ -109,6 +117,91 @@ decode(token, { secret: 'xo67Rw' }, (error, payload) => { ... });
 
 
 - `Payload` `Error`  payload if success or error.
+
+
+
+#### refresh(token, payload[, opts], cb) 
+
+decode a given jwt, if expired return new jwt.
+
+
+
+
+##### Parameters
+
+| Name | Type | Description |  |
+| ---- | ---- | ----------- | -------- |
+| token | `String`  | jwt token to refresh. | &nbsp; |
+| payload | `Object`  | data to encode. | &nbsp; |
+| opts | `Object`  | jwt verify or decoding options. | *Optional* |
+| cb | `Function`  | callback to invoke on success or failure. | &nbsp; |
+
+
+
+
+##### Examples
+
+```javascript
+
+const { refresh } = require('@lykmapipo/jwt-common');
+
+const token = 'eyJhbGciOiJIUz...';
+const payload = { _id: 'xo5', permissions: ['user:read'] };
+
+// refresh with default options
+refresh(token, payload, (error, jwt) => { ... });
+
+// refresh with provided options
+refresh(token, payload, { secret: 'xo67Rw' }, (error, jwt) => { ... });
+```
+
+
+##### Returns
+
+
+- `String` `Error`  jwt token if success or error.
+
+
+
+#### isExpired(token[, opts, cb]) 
+
+check if jwt expired without verifying if the signature is valid.
+
+
+
+
+##### Parameters
+
+| Name | Type | Description |  |
+| ---- | ---- | ----------- | -------- |
+| token | `String`  | jwt token to check for expiry. | &nbsp; |
+| opts | `Object`  | jwt verify or decoding options. | *Optional* |
+| cb | `Function`  | callback to invoke on success or failure. | *Optional* |
+
+
+
+
+##### Examples
+
+```javascript
+
+const { isExpired } = require('@lykmapipo/jwt-common');
+
+const token = 'eyJhbGciOiJIUz...';
+
+// isExpired with default options
+isExpired(token); //=> false
+
+// isExpired with provided options
+const optns = { clockTimestamp : Math.floor(Date.now() / 1000) }
+isExpired(token, optns); //=> true
+```
+
+
+##### Returns
+
+
+- `Boolean`  whether jwt expired.
 
 
 
