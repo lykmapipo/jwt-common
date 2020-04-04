@@ -1,7 +1,8 @@
 # jwt-common
 
-[![Build module-starter](https://travis-ci.org/lykmapipo/jwt-common.svg?branch=master)](https://travis-ci.org/lykmapipo/jwt-common)
-[![Dependencies module-starter](https://david-dm.org/lykmapipo/jwt-common.svg?style=flat-square)](https://david-dm.org/lykmapipo/jwt-common)
+[![Build Status](https://travis-ci.org/lykmapipo/jwt-common.svg?branch=master)](https://travis-ci.org/lykmapipo/jwt-common)
+[![Dependencies Status](https://david-dm.org/lykmapipo/jwt-common.svg?style=flat-square)](https://david-dm.org/lykmapipo/jwt-common)
+[![Coverage Status](https://coveralls.io/repos/github/lykmapipo/jwt-common/badge.svg?branch=master)](https://coveralls.io/github/lykmapipo/jwt-common?branch=master)
 
 Helper utilities for day to day [jwt](https://jwt.io/) usage.
 
