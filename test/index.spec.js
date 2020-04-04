@@ -1,3 +1,4 @@
+import { pick } from 'lodash';
 import { waterfall } from 'async';
 import { expect } from 'chai';
 import { TokenExpiredError } from 'jsonwebtoken';
@@ -5,6 +6,7 @@ import {
   withDefaults,
   encode,
   decode,
+  refresh,
   parseJwtFromHttpHeaders,
   parseJwtFromHttpQueryParams,
   parseJwtFromHttpRequest,
@@ -150,6 +152,58 @@ describe('jwt common', () => {
         expect(error.expiredAt).to.exist;
         expect(decoded).to.not.exist;
         done();
+      }
+    );
+  });
+
+  it('should return same token if not expired on refresh', (done) => {
+    expect(refresh).to.exist;
+    expect(refresh).to.be.a('function');
+    expect(refresh.name).to.be.equal('refresh');
+    expect(refresh.length).to.be.equal(4);
+
+    const payload = { _id: 'xo5', permissions: ['user:read'] };
+    const options = { secret: 'xo67', subject: 'sub', audience: 'aud' };
+    let previousJwt;
+    waterfall(
+      [
+        (next) => encode(payload, options, next),
+        (jwt, next) => {
+          previousJwt = jwt;
+          return refresh(jwt, payload, options, next);
+        },
+      ],
+      (error, freshJwt) => {
+        expect(error).to.not.exist;
+        expect(freshJwt).to.exist;
+        expect(freshJwt).to.be.eql(previousJwt);
+        done(error, freshJwt);
+      }
+    );
+  });
+
+  it('should return fresh token if previous expired on refresh', (done) => {
+    const payload = {
+      _id: 'xo5',
+      permissions: ['user:read'],
+      iat: NOW_SECONDS - 8 * YEAR_SECONDS, // issued 8 years ago
+    };
+    const options = { secret: 'xo67', subject: 'sub', audience: 'aud' };
+    let previousJwt;
+    waterfall(
+      [
+        (next) => encode(payload, options, next),
+        (jwt, next) => {
+          previousJwt = jwt;
+          const nextPayload = pick(payload, '_id', 'permissions');
+          return refresh(jwt, nextPayload, options, next);
+        },
+      ],
+      (error, freshJwt) => {
+        expect(error).to.not.exist;
+        expect(freshJwt).to.exist;
+        expect(freshJwt).to.not.be.eql(previousJwt);
+        done(error, freshJwt);
       }
     );
   });

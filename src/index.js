@@ -104,7 +104,7 @@ export const encode = (payload, optns, cb) => {
  *
  * const { decode } = require('@lykmapipo/jwt-common');
  *
- * const payload = { _id: 'xo5', permissions: ['user:read'] };
+ * const token = 'eyJhbGciOiJIUz...';
  *
  * // decode with default options
  * decode(token, (error, payload) => { ... });
@@ -122,6 +122,66 @@ export const decode = (token, optns, cb) => {
 
   // decode and verify
   return verify(token, secret, jwtVerifyOptns, done);
+};
+
+/**
+ * @function refresh
+ * @name refresh
+ * @description decode a given jwt, if expired return new jwt.
+ * @param {String} token jwt token to refresh.
+ * @param {Object} payload data to encode.
+ * @param {Object} [opts] jwt verify or decoding options.
+ * @param {Function} cb callback to invoke on success or failure.
+ * @return {String|Error} jwt token if success or error.
+ * @author lally elias <lallyelias87@mail.com>
+ * @license MIT
+ * @since 0.4.0
+ * @version 0.1.0
+ * @static
+ * @public
+ * @example
+ *
+ * const { refresh } = require('@lykmapipo/jwt-common');
+ *
+ * const token = 'eyJhbGciOiJIUz...';
+ * const payload = { _id: 'xo5', permissions: ['user:read'] };
+ *
+ * // refresh with default options
+ * refresh(token, payload, (error, jwt) => { ... });
+ *
+ * // refresh with provided options
+ * refresh(token, payload, { secret: 'xo67Rw' }, (error, jwt) => { ... });
+ */
+export const refresh = (token, payload, optns, cb) => {
+  // normalize arguments
+  const options = withDefaults(isFunction(optns) ? {} : optns);
+  const done = isFunction(optns) ? optns : cb;
+
+  // try decode token
+  const doDecode = (next) => {
+    // decode jwt
+    return decode(token, options, (error, decoded) => {
+      // ignore if expired(or jwt errors)
+      return next(null, decoded || {});
+    });
+  };
+
+  // try return fresh token
+  const doEncode = (decoded, next) => {
+    // return token if still valid
+    if (!isEmpty(decoded)) {
+      return next(null, token);
+    }
+
+    // create fresh jwt
+    return encode(payload, options, next);
+  };
+
+  // prepare refresh tasks
+  const tasks = [doDecode, doEncode];
+
+  // do refresh
+  return waterfall(tasks, done);
 };
 
 /**
