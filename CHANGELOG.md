@@ -1,3 +1,9 @@
+#### 0.4.1 (2020-04-04)
+
+##### Documentation Changes
+
+*  generate latest docs ([7b8a9525](https://github.com/lykmapipo/jwt-common/commit/7b8a9525bda7cec1ce350cf07ec3992ed3fae6a1))
+
 #### 0.4.0 (2020-04-04)
 
 ##### Chores
