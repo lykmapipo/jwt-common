@@ -1,3 +1,9 @@
+#### 0.4.14 (2020-07-20)
+
+##### Chores
+
+* **deps:**  force latest version & audit fix ([c3dc9d90](https://github.com/lykmapipo/jwt-common/commit/c3dc9d90ce5ba212956a702cc5bd3e1d9da8dda2))
+
 #### 0.4.13 (2020-07-12)
 
 ##### Chores
