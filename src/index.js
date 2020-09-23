@@ -245,12 +245,9 @@ export const isExpired = (token, optns) => {
  * @version 0.1.0
  * @private
  */
-export const decodeJwtToUser = (optns) => {
-  // normalize arguments
-  const options = withDefaults(optns);
-
+export const decodeJwtToUser = (optns = {}) => {
   // obtain jwt to user decoder
-  const { user = (token, next) => next(null, null) } = options;
+  const { user = (token, next) => next(null, null) } = optns;
 
   // wrap decoder
   const decodeToUser = (token, next) => {
