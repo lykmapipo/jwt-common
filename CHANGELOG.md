@@ -1,3 +1,9 @@
+#### 0.4.20 (2020-09-23)
+
+##### Bug Fixes
+
+* **auth:**  ensure user fetch ([e29614ff](https://github.com/lykmapipo/jwt-common/commit/e29614ff8d15475947778228d0a2f00cfc84ab65))
+
 #### 0.4.19 (2020-09-10)
 
 ##### Chores
