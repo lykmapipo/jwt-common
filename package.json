@@ -68,7 +68,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "dot-prop": "^6.0.1",
     "doxdox": "^3.0.0",
-    "eslint": "^7.16.0",
+    "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-import": "^2.22.1",
@@ -89,8 +89,8 @@
     "websocket-extensions": "^0.1.4"
   },
   "dependencies": {
-    "@lykmapipo/common": ">=0.42.5",
-    "@lykmapipo/env": ">=0.17.25",
+    "@lykmapipo/common": ">=0.42.6",
+    "@lykmapipo/env": ">=0.17.26",
     "async": ">=3.2.0",
     "jsonwebtoken": ">=8.5.1",
     "lodash": "^4.17.20"
