@@ -8,8 +8,8 @@ import { getString } from '@lykmapipo/env';
  * @function withDefaults
  * @name withDefaults
  * @description merge provided options with defaults
- * @param  {Object} [optns] provided options
- * @return {Object} merged options with environment variables
+ * @param  {object} [optns] provided options
+ * @returns {object} merged options with environment variables
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -43,10 +43,10 @@ const withDefaults = (optns) => {
  * @function encode
  * @name encode
  * @description encode given payload as jwt.
- * @param {Object} payload data to encode.
- * @param {Object} [opts] jwt sign or encoding options.
+ * @param {object} payload data to encode.
+ * @param {object} [optns] jwt sign or encoding options.
  * @param {Function} cb callback to invoke on success or failure.
- * @return {String|Error} jwt token if success or error.
+ * @returns {string | Error} jwt token if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -90,10 +90,10 @@ const encode = (payload, optns, cb) => {
  * @function decode
  * @name decode
  * @description decode and verify given jwt.
- * @param {String} token jwt token to decode.
- * @param {Object} [opts] jwt verify or decoding options.
+ * @param {string} token jwt token to decode.
+ * @param {object} [optns] jwt verify or decoding options.
  * @param {Function} cb callback to invoke on success or failure.
- * @return {Payload|Error} payload if success or error.
+ * @returns {object|Error} payload if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -128,11 +128,11 @@ const decode = (token, optns, cb) => {
  * @function refresh
  * @name refresh
  * @description decode a given jwt, if expired return new jwt.
- * @param {String} token jwt token to refresh.
- * @param {Object} payload data to encode.
- * @param {Object} [opts] jwt verify or decoding options.
+ * @param {string} token jwt token to refresh.
+ * @param {object} payload data to encode.
+ * @param {object} [optns] jwt verify or decoding options.
  * @param {Function} cb callback to invoke on success or failure.
- * @return {String|Error} jwt token if success or error.
+ * @returns {string | Error} jwt token if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.4.0
@@ -189,10 +189,9 @@ const refresh = (token, payload, optns, cb) => {
  * @name isExpired
  * @description check if jwt expired without verifying if
  * the signature is valid.
- * @param {String} token jwt token to check for expiry.
- * @param {Object} [opts] jwt verify or decoding options.
- * @param {Function} [cb] callback to invoke on success or failure.
- * @return {Boolean} whether jwt expired.
+ * @param {string} token jwt token to check for expiry.
+ * @param {object} [optns] jwt verify or decoding options.
+ * @returns {boolean} whether jwt expired.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.4.0
@@ -236,21 +235,18 @@ const isExpired = (token, optns) => {
  * @function decodeJwtToUser
  * @name decodeJwtToUser
  * @description return a function used to decode jwt to user.
- * @param {Object} [opts] decoding options.
- * @param {Functon} [opts.user]
- * @return {Function} jwt to user decoder
+ * @param {object} [optns] decoding options.
+ * @param {Function} [optns.user] custom user fetch function
+ * @returns {Function} jwt to user decoder
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.2.0
  * @version 0.1.0
  * @private
  */
-const decodeJwtToUser = (optns) => {
-  // normalize arguments
-  const options = withDefaults(optns);
-
+const decodeJwtToUser = (optns = {}) => {
   // obtain jwt to user decoder
-  const { user = (token, next) => next(null, null) } = options;
+  const { user = (token, next) => next(null, null) } = optns;
 
   // wrap decoder
   const decodeToUser = (token, next) => {
@@ -265,9 +261,9 @@ const decodeJwtToUser = (optns) => {
  * @function parseJwtFromHttpHeaders
  * @name parseJwtFromHttpHeaders
  * @description parse request headers to get jwt.
- * @params {Object} request valid http request object.
+ * @param {object} request valid http request object.
  * @param {Function} done callback to invoke on success or failure.
- * @return {Payload|Error} jwt if success or error.
+ * @returns {object|Error} jwt if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -312,9 +308,9 @@ const parseJwtFromHttpHeaders = (request, done) => {
  * @function parseJwtFromHttpQueryParams
  * @name parseJwtFromHttpQueryParams
  * @description parse request headers to get jwt.
- * @params {Object} request valid http request object.
+ * @param {object} request valid http request object.
  * @param {Function} done callback to invoke on success or failure.
- * @return {Payload|Error} jwt if success or error.
+ * @returns {object|Error} jwt if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -342,9 +338,9 @@ const parseJwtFromHttpQueryParams = (request, done) => {
  * @function parseJwtFromHttpRequest
  * @name parseJwtFromHttpRequest
  * @description parse request headers to get jwt.
- * @params {Object} request valid http request object.
+ * @param {object} request valid http request object.
  * @param {Function} done callback to invoke on success or failure.
- * @return {Payload|Error} jwt if success or error.
+ * @returns {object|Error} jwt if success or error.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -358,7 +354,7 @@ const parseJwtFromHttpQueryParams = (request, done) => {
  */
 const parseJwtFromHttpRequest = (request, done) => {
   // parse for jwt from request headers and query params
-  parallel(
+  return parallel(
     {
       headerToken: (next) => parseJwtFromHttpHeaders(request, next),
       urlToken: (next) => parseJwtFromHttpQueryParams(request, next),
@@ -382,8 +378,8 @@ const parseJwtFromHttpRequest = (request, done) => {
  * @function jwtAuth
  * @name jwtAuth
  * @description create middlware to authorize request using jwt
- * @param {Object} [opts] jwt verify or decoding options.
- * @return {Function} express compactoble middleware.
+ * @param {object} [optns] jwt verify or decoding options.
+ * @returns {Function} express compactoble middleware.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
@@ -432,8 +428,8 @@ const jwtAuth = (optns) => {
  * @function jwtPermit
  * @name jwtPermit
  * @description create middlware to check request for jwt permissions(or scopes).
- * @param {String[]|...String} requiredScopes required scopes or permissions.
- * @return {Function} express compactoble middleware.
+ * @param {string[] | ...string} requiredScopes required scopes or permissions.
+ * @returns {Function} express compactoble middleware.
  * @author lally elias <lallyelias87@mail.com>
  * @license MIT
  * @since 0.1.0
