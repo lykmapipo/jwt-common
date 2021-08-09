@@ -1,8 +1,14 @@
 # jwt-common
 
 [![Build Status](https://travis-ci.org/lykmapipo/jwt-common.svg?branch=master)](https://travis-ci.org/lykmapipo/jwt-common)
-[![Dependencies Status](https://david-dm.org/lykmapipo/jwt-common.svg?style=flat-square)](https://david-dm.org/lykmapipo/jwt-common)
+[![Dependencies Status](https://david-dm.org/lykmapipo/jwt-common.svg)](https://david-dm.org/lykmapipo/jwt-common)
 [![Coverage Status](https://coveralls.io/repos/github/lykmapipo/jwt-common/badge.svg?branch=master)](https://coveralls.io/github/lykmapipo/jwt-common?branch=master)
+[![GitHub License](https://img.shields.io/github/license/lykmapipo/jwt-common)](https://github.com/lykmapipo/jwt-common/blob/master/LICENSE)
+
+[![Commitizen Friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
+[![npm version](https://img.shields.io/npm/v/@lykmapipo/jwt-common)](https://www.npmjs.com/package/@lykmapipo/jwt-common)
 
 Helper utilities for day to day [jwt](https://jwt.io/) usage.
 
