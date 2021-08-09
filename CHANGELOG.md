@@ -1,3 +1,18 @@
+#### 0.4.30 (2021-08-09)
+
+##### Chores
+
+* **deps:**  force latest version & audit fix ([a613e01d](https://github.com/lykmapipo/jwt-common/commit/a613e01d74511e9e7a1d01a19d72653d4efbda77))
+
+##### Documentation Changes
+
+* **license:**  remove year ([a706425b](https://github.com/lykmapipo/jwt-common/commit/a706425b8c5625b5fd4e4c950419f167bbd1875d))
+* **readme:**  update status badges ([75673508](https://github.com/lykmapipo/jwt-common/commit/756735081ad4e30bf7db570c32ae1c9ef7441563))
+
+##### Other Changes
+
+* **community:**  add code of conduct & contributing guide ([0ec30c54](https://github.com/lykmapipo/jwt-common/commit/0ec30c54757b7d5b19644b7fd9ece590f66fb3cb))
+
 #### 0.4.29 (2021-06-05)
 
 ##### Chores
