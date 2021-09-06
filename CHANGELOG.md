@@ -1,3 +1,13 @@
+#### 0.4.31 (2021-09-06)
+
+##### Chores
+
+* **deps:**  force latest version & audit fix ([343d7402](https://github.com/lykmapipo/jwt-common/commit/343d740204bcc9649853a5cfe85944045507356c))
+
+##### Documentation Changes
+
+* **readme:**  update build status to travis.com ([59fc5fb8](https://github.com/lykmapipo/jwt-common/commit/59fc5fb83b79859a49efb18aaf5bd361cc6afadd))
+
 #### 0.4.30 (2021-08-09)
 
 ##### Chores
